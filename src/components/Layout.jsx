@@ -21,6 +21,7 @@ import {
   Edit as EditIcon,
   Lock as LockIcon,
   Timeline as TimelineIcon,
+  Psychology as PsychologyIcon,
 } from '@mui/icons-material';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -30,6 +31,13 @@ import TextField from '@mui/material/TextField';
 import GoogleIcon from '@mui/icons-material/Google';
 import StarIcon from '@mui/icons-material/Star';
 import ChatIcon from '@mui/icons-material/Chat';
+import Switch from '@mui/material/Switch';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import { useContext } from 'react';
+import { ThemeToggleContext } from '../App';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, sendEmailVerification } from 'firebase/auth';
 
 const drawerWidth = 240;
 
@@ -40,6 +48,7 @@ const menuItems = [
   { text: 'Timeline', icon: <TimelineIcon />, path: '/timeline' },
   { text: 'GrowthLens', icon: <TimelineIcon />, path: '/growthlens' },
   { text: 'Letter Wall', icon: <LockIcon />, path: '/wall' },
+  { text: 'AI Insights', icon: <PsychologyIcon />, path: '/insights' },
 ];
 
 function Layout({ children }) {
@@ -63,19 +72,35 @@ function Layout({ children }) {
   });
   const [aiCoachOpen, setAiCoachOpen] = useState(false);
   const [aiCoachPromptOpen, setAiCoachPromptOpen] = useState(false);
+  const { useModernTheme, toggleTheme } = useContext(ThemeToggleContext);
+  const [authError, setAuthError] = useState('');
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const handleSignIn = () => {
-    if (!email) return;
-    const mockUser = { email, name: email.split('@')[0] };
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    setAuthOpen(false);
+  const handleSignIn = async () => {
+    setAuthError('');
+    try {
+      if (authTab === 'signin') {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        setUser({ email: userCredential.user.email });
+        localStorage.setItem('user', JSON.stringify({ email: userCredential.user.email }));
+        setAuthOpen(false);
+      } else {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        setUser({ email: userCredential.user.email });
+        localStorage.setItem('user', JSON.stringify({ email: userCredential.user.email }));
+        await sendEmailVerification(userCredential.user);
+        setAuthError('A verification email has been sent to your email address. Please check your inbox.');
+        setAuthOpen(false);
+      }
+    } catch (error) {
+      setAuthError(error.message);
+    }
   };
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await signOut(auth);
     setUser(null);
     localStorage.removeItem('user');
   };
@@ -91,6 +116,16 @@ function Layout({ children }) {
     setIsPremium(true);
     localStorage.setItem('isPremium', 'true');
     setPremiumOpen(false);
+  };
+
+  const handlePasswordReset = async () => {
+    setAuthError('');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setAuthError('Password reset email sent!');
+    } catch (error) {
+      setAuthError(error.message);
+    }
   };
 
   const drawer = (
@@ -141,6 +176,14 @@ function Layout({ children }) {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Mental Health Time Capsule
           </Typography>
+          <LightModeIcon sx={{ color: useModernTheme ? 'primary.main' : 'grey.500' }} />
+          <Switch
+            checked={useModernTheme}
+            onChange={toggleTheme}
+            color="primary"
+            inputProps={{ 'aria-label': 'theme switch' }}
+          />
+          <DarkModeIcon sx={{ color: !useModernTheme ? 'primary.main' : 'grey.500' }} />
           {isPremium && (
             <Chip icon={<StarIcon sx={{ color: '#FFD600' }} />} label="Premium" color="warning" sx={{ mr: 2, fontWeight: 700 }} />
           )}
@@ -251,6 +294,12 @@ function Layout({ children }) {
             onChange={e => setPassword(e.target.value)}
             sx={{ mb: 2 }}
           />
+          {authError && <Typography color="error" sx={{ mb: 1 }}>{authError}</Typography>}
+          {authTab === 'signin' && (
+            <Button onClick={handlePasswordReset} sx={{ mb: 1, textTransform: 'none' }}>
+              Forgot password?
+            </Button>
+          )}
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
           <Button onClick={() => setAuthTab(authTab === 'signin' ? 'signup' : 'signin')}>
