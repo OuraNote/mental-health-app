@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Card, CardContent, Typography, Grid, CircularProgress, Chip } from '@mui/material';
+import { Box, Card, CardContent, Typography, Grid, CircularProgress, Chip, Button } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -18,6 +18,8 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import CreateIcon from '@mui/icons-material/Create';
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
+import { useNavigate } from 'react-router-dom';
 
 // Register ChartJS components
 ChartJS.register(
@@ -36,6 +38,7 @@ const AIInsights = () => {
   const [metrics, setMetrics] = useState(null);
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (letters) {
@@ -51,10 +54,46 @@ const AIInsights = () => {
     }
   }, [letters]);
 
+  const handleNewPrompt = () => {
+    setPrompt(generatePrompt(letters));
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  // No data state
+  if (!letters || letters.length === 0) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <SentimentVeryDissatisfiedIcon sx={{ fontSize: 80, color: 'primary.light', mb: 2 }} />
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          No entries yet
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 4 }}>
+          Start by writing your first letter to unlock AI-powered insights and personal growth analytics!
+        </Typography>
+        <Card elevation={3} sx={{ mb: 4, bgcolor: 'primary.light', color: 'primary.contrastText', maxWidth: 500, mx: 'auto' }}>
+          <CardContent>
+            <Box display="flex" alignItems="center" mb={2}>
+              <CreateIcon sx={{ mr: 1 }} />
+              <Typography variant="h6">Today's Writing Prompt</Typography>
+            </Box>
+            <Typography variant="h5" sx={{ mb: 2 }}>
+              {prompt}
+            </Typography>
+            <Button variant="contained" color="secondary" onClick={handleNewPrompt} sx={{ fontWeight: 700, mb: 2 }}>
+              New Prompt
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => navigate('/write')} sx={{ fontWeight: 700, ml: 2 }}>
+              Write Your First Letter
+            </Button>
+          </CardContent>
+        </Card>
       </Box>
     );
   }
@@ -182,15 +221,18 @@ const AIInsights = () => {
       </Grid>
 
       {/* Writing Prompt */}
-      <Card elevation={2} sx={{ mb: 4, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
+      <Card elevation={2} sx={{ mb: 4, bgcolor: 'primary.light', color: 'primary.contrastText', maxWidth: 600, mx: 'auto' }}>
         <CardContent>
           <Box display="flex" alignItems="center" mb={2}>
             <CreateIcon sx={{ mr: 1 }} />
             <Typography variant="h6">Today's Writing Prompt</Typography>
           </Box>
-          <Typography variant="h5">
+          <Typography variant="h5" sx={{ mb: 2 }}>
             {prompt}
           </Typography>
+          <Button variant="contained" color="secondary" onClick={handleNewPrompt} sx={{ fontWeight: 700 }}>
+            New Prompt
+          </Button>
         </CardContent>
       </Card>
 
