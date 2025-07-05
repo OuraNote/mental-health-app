@@ -76,7 +76,8 @@ function LetterWall() {
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
+      background: '#e0f7fa',
+      backgroundImage: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
       py: 6,
     }}>
       <Container maxWidth="lg">
