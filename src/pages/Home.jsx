@@ -13,12 +13,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import { useAppStore } from '../store';
 
 function Home() {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const { spotlightRefs, startSpotlightTour } = useContext(SpotlightTourContext) || {};
   const [premiumPromptOpen, setPremiumPromptOpen] = useState(false);
+  const letters = useAppStore(state => state.letters);
   const isPremium = (() => {
     try {
       return JSON.parse(localStorage.getItem('isPremium') || 'false');
@@ -80,13 +82,35 @@ function Home() {
     },
   ];
 
-  // Mock streak count
-  const streak = 5;
+  // Real streak calculation
+  const getStreak = () => {
+    if (!letters || letters.length === 0) return 0;
+    // Get all unique valid dates (YYYY-MM-DD) with at least one letter
+    const dateSet = new Set(
+      letters.map(l => {
+        const rawDate = l.date || l.createdAt;
+        if (!rawDate) return null;
+        const d = new Date(rawDate);
+        if (isNaN(d.getTime())) return null;
+        return d.toISOString().slice(0, 10);
+      }).filter(Boolean)
+    );
+    // Start from today, count consecutive days with entries
+    let streak = 0;
+    let current = new Date();
+    while (dateSet.has(current.toISOString().slice(0, 10))) {
+      streak++;
+      current.setDate(current.getDate() - 1);
+    }
+    return streak;
+  };
+  const streak = getStreak();
 
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
+      background: '#e0f7fa',
+      backgroundImage: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -128,20 +152,19 @@ function Home() {
           <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#f3e5f5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center' }}>
               Mobile Premium Features
-              {!isPremium && <LockIcon color="warning" sx={{ ml: 1 }} />}
             </Typography>
-            {isPremium ? (
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ mb: 1 }}>Enjoy offline access, push notification prompts, voice-to-letter transcription, and widgets!</Typography>
-                <Button variant="outlined" size="small" sx={{ mt: 1 }}>Enable Offline Mode</Button>
-                <Button variant="outlined" size="small" sx={{ mt: 1, ml: 2 }}>Set Up Widgets</Button>
-              </Box>
-            ) : (
-              <Box sx={{ textAlign: 'center', color: '#888' }}>
-                <Typography sx={{ mb: 2 }}>Upgrade to Premium to unlock offline access, push notifications, voice-to-letter, and widgets.</Typography>
-                <Button variant="contained" color="warning" onClick={() => setPremiumPromptOpen(true)} startIcon={<LockIcon />}>Go Premium</Button>
-              </Box>
-            )}
+            <Typography sx={{ mb: 2, color: '#888' }}>
+              Coming Soon
+            </Typography>
+            <Typography sx={{ mb: 3, color: '#888' }}>
+              Enjoy offline access, push notification prompts, voice-to-letter transcription, and widgets in a future update!
+            </Typography>
+            <Button variant="outlined" size="small" sx={{ mt: 1, mb: 1 }} disabled>
+              ENABLE OFFLINE MODE
+            </Button>
+            <Button variant="outlined" size="small" sx={{ mb: 1 }} disabled>
+              SET UP WIDGETS
+            </Button>
           </Paper>
           <Tooltip title="Start your first letter!" arrow>
             <Button
@@ -187,20 +210,14 @@ function Home() {
         <DialogContent>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <LockIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>Recurring Prompts & Streaks</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>Coming Soon</Typography>
           </Box>
           <Typography sx={{ mb: 2 }}>
-            Upgrade to Premium to unlock recurring prompts, milestone reminders, streak tracking, and more.
+            This feature will be available in a future update.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPremiumPromptOpen(false)}>Cancel</Button>
-          <Button variant="contained" color="warning" onClick={() => {
-            setPremiumPromptOpen(false);
-            window.dispatchEvent(new Event('openPremiumModal'));
-          }}>
-            Go Premium
-          </Button>
+          <Button onClick={() => setPremiumPromptOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </Box>
