@@ -33,6 +33,7 @@ import { useAppStore } from '../store';
 import { SpotlightTourContext } from '../App';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Chip from '@mui/material/Chip';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const MOOD_OPTIONS = [
   'Joyful', 'Hopeful', 'Grateful', 'Calm', 'Anxious', 'Sad', 'Angry', 'Lonely', 'Confident', 'Inspired'
@@ -100,6 +101,7 @@ function WriteLetter() {
   const tasks = useAppStore(state => state.tasks);
   const addTask = useAppStore(state => state.addTask);
   const addLetter = useAppStore(state => state.addLetter);
+  const deleteTask = useAppStore(state => state.deleteTask);
 
   const { spotlightRefs } = useContext(SpotlightTourContext) || {};
 
@@ -243,7 +245,8 @@ function WriteLetter() {
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
+      background: '#e0f7fa',
+      backgroundImage: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
       py: 6,
     }}>
       <Container maxWidth="md">
@@ -287,12 +290,12 @@ function WriteLetter() {
                 </Grid>
               </Grid>
               <List dense sx={{ mt: 2, maxHeight: 120, overflow: 'auto', bgcolor: '#fafafa', borderRadius: 1 }}>
-                {tasks.length === 0 && (
+                {tasks.filter(task => !task.completed).length === 0 && (
                   <ListItem>
                     <ListItemText primary="No tasks yet. Add one above!" />
                   </ListItem>
                 )}
-                {tasks.map(task => (
+                {tasks.filter(task => !task.completed).map(task => (
                   <ListItem
                     key={task.id}
                     button
@@ -305,6 +308,9 @@ function WriteLetter() {
                       primary={task.description}
                       secondary={task.completed ? 'Completed' : ''}
                     />
+                    <IconButton edge="end" aria-label="delete" onClick={e => { e.stopPropagation(); deleteTask(task.id); }}>
+                      <DeleteIcon />
+                    </IconButton>
                   </ListItem>
                 ))}
               </List>
@@ -340,6 +346,20 @@ function WriteLetter() {
                   ) : mediaType === 'video' ? (
                     <video controls src={mediaUrl} style={{ maxWidth: '100%' }} />
                   ) : null}
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    sx={{ mt: 1, ml: 1 }}
+                    onClick={() => {
+                      setMediaBlob(null);
+                      setMediaUrl('');
+                      setMediaType('none');
+                      setTranscription('');
+                      setMediaSentiment(null);
+                    }}
+                  >
+                    Remove {mediaType === 'audio' ? 'Audio' : 'Video'}
+                  </Button>
                   {transcription && (
                     <Box sx={{ mt: 1 }}>
                       <Typography variant="subtitle2">Transcription:</Typography>
@@ -444,6 +464,22 @@ function WriteLetter() {
                       )}
                     </Box>
                   </Tooltip>
+                </Grid>
+
+                <Grid item xs={12}>
+                  {image && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography>Selected: {image.name}</Typography>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        sx={{ mt: 1, ml: 1 }}
+                        onClick={() => setImage(null)}
+                      >
+                        Remove Image
+                      </Button>
+                    </Box>
+                  )}
                 </Grid>
 
                 <Grid item xs={12}>
