@@ -60,5 +60,4 @@ Pull requests, issues, and feedback are welcome! Please open an issue or contact
 
 ---
 
-## 📄 License
-MIT License
+
