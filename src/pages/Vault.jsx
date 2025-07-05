@@ -28,6 +28,7 @@ import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
 import { SpotlightTourContext } from '../App';
 import { useNavigate } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // Mock data - In a real app, this would come from a backend
 const mockLetters = [
@@ -72,6 +73,8 @@ function Vault() {
   })();
 
   const { spotlightRefs } = useContext(SpotlightTourContext) || {};
+
+  const deleteLetter = useAppStore(state => state.deleteLetter);
 
   useState(() => { setTimeout(() => setShow(true), 200); }, []);
 
@@ -179,6 +182,13 @@ function Vault() {
     }
   };
 
+  const handleDeleteLetter = async (letterId) => {
+    if (window.confirm('Are you sure you want to delete this letter? This cannot be undone.')) {
+      await deleteLetter(letterId);
+      setSnackbar({ open: true, message: 'Letter deleted.' });
+    }
+  };
+
   if (!letters) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
@@ -190,7 +200,8 @@ function Vault() {
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
+      background: '#e0f7fa',
+      backgroundImage: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
       py: 6,
     }}>
       <Container maxWidth="lg">
@@ -318,6 +329,15 @@ function Vault() {
                               </Button>
                             </span>
                           </Tooltip>
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            sx={{ mt: 1 }}
+                            onClick={() => handleDeleteLetter(letter.id)}
+                          >
+                            Delete
+                          </Button>
                         </CardContent>
                       </Card>
                     </Fade>
