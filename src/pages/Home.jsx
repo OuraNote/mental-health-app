@@ -9,23 +9,13 @@ import { useEffect, useState, useContext } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import { SpotlightTourContext } from '../App';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import { useAppStore } from '../store';
 
 function Home() {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const { spotlightRefs, startSpotlightTour } = useContext(SpotlightTourContext) || {};
-  const [premiumPromptOpen, setPremiumPromptOpen] = useState(false);
   const letters = useAppStore(state => state.letters);
-  const isPremium = (() => {
-    try {
-      return JSON.parse(localStorage.getItem('isPremium') || 'false');
-    } catch { return false; }
-  })();
 
   const PROMPTS = [
     'What are you grateful for today?',
@@ -115,46 +105,37 @@ function Home() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      py: 6,
+      py: { xs: 2, sm: 6 },
+      px: { xs: 1, sm: 0 },
     }}>
       <Fade in={show} timeout={1200}>
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
-          <Typography variant="h2" sx={{ fontWeight: 800, mb: 2, color: 'primary.main', letterSpacing: 1 }}>
+        <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 6 }, width: '100%' }}>
+          <Typography variant="h2" sx={{ fontWeight: 800, mb: { xs: 1, sm: 2 }, color: 'primary.main', letterSpacing: 1, fontSize: { xs: '2rem', sm: '2.8rem' } }}>
             Welcome to Your Time Capsule
           </Typography>
-          <Typography variant="h5" color="text.secondary" sx={{ mb: 3 }}>
+          <Typography variant="h5" color="text.secondary" sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1.1rem', sm: '1.5rem' } }}>
             Reflect, grow, and connect with your future self in a safe, beautiful space.
           </Typography>
-          <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#fffbe7', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <LightbulbIcon sx={{ color: '#FFD600', fontSize: 36, mb: 1 }} />
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Daily Reflection Prompt</Typography>
-            <Typography sx={{ fontSize: '1.15rem', mb: 2, color: '#555' }}>{PROMPTS[promptIdx]}</Typography>
-            <Button variant="outlined" size="small" onClick={handleNewPrompt}>New Prompt</Button>
+          <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#fffbe7', display: 'flex', flexDirection: 'column', alignItems: 'center', width: { xs: '100%', sm: 'auto' } }}>
+            <LightbulbIcon sx={{ color: '#FFD600', fontSize: { xs: 28, sm: 36 }, mb: 1 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>Daily Reflection Prompt</Typography>
+            <Typography sx={{ fontSize: { xs: '1rem', sm: '1.15rem' }, mb: 2, color: '#555' }}>{PROMPTS[promptIdx]}</Typography>
+            <Button variant="outlined" size="small" onClick={handleNewPrompt} sx={{ fontSize: { xs: '1rem', sm: '1.1rem' }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }}>New Prompt</Button>
           </Paper>
-          <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#e3f2fd', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center' }}>
-              Recurring Prompts & Streaks
-            </Typography>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography sx={{ mb: 1 }}>You've journaled <b>{streak}</b> days in a row!</Typography>
-              <Button variant="outlined" size="small" sx={{ mt: 1 }}>Schedule a Recurring Letter</Button>
-              <Button variant="outlined" size="small" sx={{ mt: 1, ml: 2 }}>Browse Prompt Packs</Button>
-            </Box>
-          </Paper>
-          <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#f3e5f5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center' }}>
+          <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#f3e5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', width: { xs: '100%', sm: 'auto' } }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' }, display: 'flex', alignItems: 'center' }}>
               Mobile Premium Features
             </Typography>
-            <Typography sx={{ mb: 2, color: '#888' }}>
+            <Typography sx={{ mb: 2, color: '#888', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
               Coming Soon
             </Typography>
-            <Typography sx={{ mb: 3, color: '#888' }}>
+            <Typography sx={{ mb: 3, color: '#888', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
               Enjoy offline access, push notification prompts, voice-to-letter transcription, and widgets in a future update!
             </Typography>
-            <Button variant="outlined" size="small" sx={{ mt: 1, mb: 1 }} disabled>
+            <Button variant="outlined" size="small" sx={{ mt: 1, mb: 1, fontSize: { xs: '0.95rem', sm: '1.1rem' }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }} disabled>
               ENABLE OFFLINE MODE
             </Button>
-            <Button variant="outlined" size="small" sx={{ mb: 1 }} disabled>
+            <Button variant="outlined" size="small" sx={{ mb: 1, fontSize: { xs: '0.95rem', sm: '1.1rem' }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }} disabled>
               SET UP WIDGETS
             </Button>
           </Paper>
@@ -164,23 +145,23 @@ function Home() {
               variant="contained"
               size="large"
               color="primary"
-              sx={{ borderRadius: 32, px: 6, py: 2, fontSize: '1.3rem', fontWeight: 700, boxShadow: 3 }}
+              sx={{ borderRadius: 32, px: { xs: 3, sm: 6 }, py: { xs: 1.5, sm: 2 }, fontSize: { xs: '1.1rem', sm: '1.3rem' }, fontWeight: 700, boxShadow: 3, width: { xs: '100%', sm: 'auto' } }}
               onClick={() => navigate('/write')}
             >
               Get Started
             </Button>
           </Tooltip>
-          <Button onClick={startSpotlightTour} sx={{ ml: 2, mt: 2 }} variant="outlined">Start Spotlight Tour</Button>
+          <Button onClick={startSpotlightTour} sx={{ ml: { xs: 0, sm: 2 }, mt: 2, width: { xs: '100%', sm: 'auto' }, fontSize: { xs: '1rem', sm: '1.1rem' } }} variant="outlined">Start Spotlight Tour</Button>
         </Box>
       </Fade>
-      <Grid container spacing={4} justifyContent="center" sx={{ maxWidth: 900, px: { xs: 1, sm: 3 } }}>
+      <Grid container spacing={4} justifyContent="center" sx={{ maxWidth: 900, px: { xs: 0.5, sm: 3 } }}>
         {features.map((feature, idx) => (
           <Grid item xs={12} sm={6} md={4} key={feature.title}>
             <Fade in={show} style={{ transitionDelay: `${400 + idx * 200}ms` }}>
-              <Paper elevation={4} sx={{ p: 4, borderRadius: 6, textAlign: 'center', minHeight: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 4px 24px 0 rgba(110,198,255,0.10)' }}>
+              <Paper elevation={4} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, textAlign: 'center', minHeight: { xs: 160, sm: 220 }, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 4px 24px 0 rgba(110,198,255,0.10)', width: '100%' }}>
                 <Box sx={{ mb: 2 }}>{feature.icon}</Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>{feature.title}</Typography>
-                <Typography color="text.secondary" sx={{ mb: 2 }}>{feature.description}</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>{feature.title}</Typography>
+                <Typography color="text.secondary" sx={{ mb: 2, fontSize: { xs: '0.98rem', sm: '1.1rem' } }}>{feature.description}</Typography>
                 <Tooltip title={`Learn more about ${feature.title}`} arrow>
                   <Button
                     ref={
@@ -188,7 +169,7 @@ function Home() {
                       feature.title === 'Secure Vault' ? spotlightRefs?.exploreVault :
                       feature.title === 'Emotional Timeline' ? spotlightRefs?.exploreTimeline : undefined
                     }
-                    variant="outlined" color="primary" sx={{ borderRadius: 24, fontWeight: 600 }} onClick={() => navigate(feature.path)}>
+                    variant="outlined" color="primary" sx={{ borderRadius: 24, fontWeight: 600, fontSize: { xs: '1rem', sm: '1.1rem' }, width: { xs: '100%', sm: 'auto' }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }} onClick={() => navigate(feature.path)}>
                     Explore
                   </Button>
                 </Tooltip>
@@ -197,21 +178,6 @@ function Home() {
           </Grid>
         ))}
       </Grid>
-      <Dialog open={premiumPromptOpen} onClose={() => setPremiumPromptOpen(false)}>
-        <DialogTitle>Premium Feature</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <LockIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>Coming Soon</Typography>
-          </Box>
-          <Typography sx={{ mb: 2 }}>
-            This feature will be available in a future update.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPremiumPromptOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }
