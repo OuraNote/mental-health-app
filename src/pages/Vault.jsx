@@ -185,6 +185,10 @@ function Vault() {
   const handleDeleteLetter = async (letterId) => {
     if (window.confirm('Are you sure you want to delete this letter? This cannot be undone.')) {
       await deleteLetter(letterId);
+      // Reload letters for extra reliability
+      if (useAppStore.getState().loadLetters) {
+        await useAppStore.getState().loadLetters();
+      }
       setSnackbar({ open: true, message: 'Letter deleted.' });
     }
   };
@@ -202,18 +206,19 @@ function Vault() {
       minHeight: '100vh',
       background: '#e0f7fa',
       backgroundImage: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
-      py: 6,
+      py: { xs: 2, sm: 6 },
+      px: { xs: 1, sm: 0 },
     }}>
-      <Container maxWidth="lg">
+      <Container maxWidth="md" sx={{ px: { xs: 0.5, sm: 2 } }}>
         <Fade in={true} timeout={1200}>
-          <Paper elevation={6} sx={{ p: 5, borderRadius: 6, mb: 4, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)' }}>
-            <Typography variant="h3" sx={{ fontWeight: 800, mb: 2, color: 'primary.main', letterSpacing: 1, textAlign: 'center' }}>
+          <Paper elevation={6} sx={{ p: { xs: 2, sm: 5 }, borderRadius: 4, mb: { xs: 2, sm: 4 }, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)' }}>
+            <Typography variant="h3" sx={{ fontWeight: 800, mb: { xs: 1, sm: 2 }, color: 'primary.main', letterSpacing: 1, textAlign: 'center', fontSize: { xs: '1.5rem', sm: '2.2rem' } }}>
               Your Time Capsule Vault
             </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 4, textAlign: 'center' }}>
+            <Typography variant="h6" color="text.secondary" sx={{ mb: { xs: 2, sm: 4 }, textAlign: 'center', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
               All your letters are safe and private until their unlock date. Open, reflect, and grow!
             </Typography>
-            <Grid container spacing={4}>
+            <Grid container spacing={2}>
               {letters.length === 0 && (
                 <Grid item xs={12}>
                   <Typography>No letters yet. Write one!</Typography>
@@ -243,9 +248,10 @@ function Vault() {
                             boxShadow: unlocked ? '0 12px 36px 0 rgba(110,198,255,0.18)' : undefined,
                           },
                           background: unlocked ? 'linear-gradient(135deg, #e3fcec 0%, #e0f7fa 100%)' : '#f5f5f5',
+                          mb: { xs: 2, sm: 0 },
                         }}
                       >
-                        <CardContent>
+                        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
                           <Box
                             sx={{
                               position: 'absolute',
@@ -257,15 +263,15 @@ function Vault() {
                           >
                             {unlocked ? <LockOpenIcon fontSize="inherit" /> : <LockIcon fontSize="inherit" />}
                           </Box>
-                          <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
+                          <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                             Letter #{letter.id}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}>
                             Unlocks: {new Date(letter.unlockDate).toLocaleDateString()}
                           </Typography>
                           {task && (
                             <Box sx={{ mt: 1, mb: 1 }}>
-                              <Typography variant="body2" color="primary">
+                              <Typography variant="body2" color="primary" sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}>
                                 Task: {task.description}
                               </Typography>
                               <List dense>
@@ -284,6 +290,7 @@ function Vault() {
                                   )}
                                   <ListItemText
                                     primary={task.completed ? 'Completed' : (isLetterUnlocked(letter) ? 'Mark as complete to unlock' : 'Locked')}
+                                    sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}
                                   />
                                 </ListItem>
                               </List>
@@ -294,7 +301,7 @@ function Vault() {
                               ref={idx === 0 ? spotlightRefs?.vaultOpenBtn : undefined}
                               variant="contained"
                               fullWidth
-                              sx={{ mt: 2, borderRadius: 24, fontWeight: 700, fontSize: '1.1rem', py: 1.2, boxShadow: 2 }}
+                              sx={{ mt: 2, borderRadius: 24, fontWeight: 700, fontSize: { xs: '1rem', sm: '1.1rem' }, py: 1.2, boxShadow: 2 }}
                               onClick={() => handleOpenLetter(letter)}
                               disabled={!unlocked}
                             >
@@ -307,7 +314,7 @@ function Vault() {
                                 variant="outlined"
                                 color="secondary"
                                 fullWidth
-                                sx={{ mt: 1, borderRadius: 24, fontWeight: 600 }}
+                                sx={{ mt: 1, borderRadius: 24, fontWeight: 600, fontSize: { xs: '0.95rem', sm: '1rem' } }}
                                 onClick={() => handleEditLetter(letter)}
                               >
                                 Edit
@@ -320,7 +327,7 @@ function Vault() {
                                 variant="outlined"
                                 color="secondary"
                                 size="small"
-                                sx={{ mt: 1, borderRadius: 24, fontWeight: 600 }}
+                                sx={{ mt: 1, borderRadius: 24, fontWeight: 600, fontSize: { xs: '0.95rem', sm: '1rem' } }}
                                 onClick={() => {
                                   if (!isPremium) {
                                     setPremiumPromptOpen(true);
@@ -340,7 +347,7 @@ function Vault() {
                             variant="outlined"
                             color="error"
                             startIcon={<DeleteIcon />}
-                            sx={{ mt: 1 }}
+                            sx={{ mt: 1, fontSize: { xs: '0.95rem', sm: '1rem' } }}
                             onClick={() => handleDeleteLetter(letter.id)}
                           >
                             Delete
