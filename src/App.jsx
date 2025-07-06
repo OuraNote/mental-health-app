@@ -208,68 +208,68 @@ export const SpotlightTourContext = createContext();
 
 const TOUR_STEPS = [
   {
-    title: 'Get Started',
-    content: 'Click here to start writing your first letter!',
+    title: 'Welcome! Start Your Journey',
+    content: 'Welcome to your Mental Health Time Capsule! This app helps you reflect, grow, and connect with your future self. Let’s take a quick tour of the main features. (Tip: Works great on mobile too!)',
     refKey: 'getStartedBtn',
   },
   {
     title: 'Write Letters',
-    content: 'Explore the Write Letters feature to compose heartfelt messages to your future self.',
+    content: 'Tap "Write Letters" to compose a private message to your future self. You can add a title, set an unlock date, and even attach an image or voice note. On mobile, use the big buttons and simple form for easy writing.',
     refKey: 'exploreWrite',
   },
   {
     title: 'Secure Vault',
-    content: 'Your letters are safely stored in the Vault until their unlock date.',
+    content: 'All your letters are safely stored in the Vault. They remain private and locked until their unlock date or until you complete a linked task. Tap a card to see more details.',
     refKey: 'exploreVault',
   },
   {
     title: 'Emotional Timeline',
-    content: 'Track your emotional journey through time with the Timeline.',
+    content: 'The Timeline visualizes your emotional journey over time. Each letter’s mood is analyzed and plotted, so you can see your growth. Pinch or scroll to zoom on mobile.',
     refKey: 'exploreTimeline',
   },
   {
     title: 'Write Letter Form',
-    content: 'This is where you write your letter, set a date, and add an image or recording.',
+    content: 'This is the main form for writing a letter. Fill in your thoughts, set a date, and add optional attachments. On mobile, the form is optimized for touch and easy scrolling.',
     refKey: 'writeLetterForm',
   },
   {
     title: 'Your Vault',
-    content: 'All your letters are stored here. Click a card to open a letter.',
+    content: 'The Vault shows all your letters. Tap a card to open, reflect, or respond. Locked letters show their unlock date and any required tasks.',
     refKey: 'vaultFirstCard',
   },
   {
     title: 'Open Letter',
-    content: 'Open a letter to read, reflect, and respond to your past self.',
+    content: 'Open a letter to read your past thoughts, reflect, and even write a response to your past self. On mobile, swipe up to scroll through the letter.',
     refKey: 'vaultOpenBtn',
   },
   {
     title: 'Share Anonymously',
-    content: 'Share your letter anonymously to inspire others.',
+    content: 'You can share a letter anonymously to inspire others on the Letter Wall. Choose tags to help others find your story.',
     refKey: 'vaultShareBtn',
   },
   {
     title: 'Timeline Chart',
-    content: 'See your emotional journey visualized over time.',
+    content: 'See your moods and emotional trends over time. The chart is interactive—tap or drag to explore on mobile.',
     refKey: 'timelineChart',
   },
   {
     title: 'Word Cloud',
-    content: 'Your most frequent words and values appear here.',
+    content: 'The GrowthLens word cloud shows your most frequent words and values. Bigger words mean more focus in your writing.',
     refKey: 'growthWordCloud',
   },
   {
     title: 'Filter Letters',
-    content: 'Filter anonymous letters by theme.',
+    content: 'On the Letter Wall, filter anonymous letters by theme or mood. Great for finding stories that resonate with you.',
     refKey: 'wallFilterChip',
   },
   {
     title: 'Like Letters',
-    content: 'Like a letter that resonates with you.',
+    content: 'Tap the heart to like a letter that inspires you. On mobile, just tap the icon—no need to sign in.',
     refKey: 'wallLikeBtn',
   },
   {
-    title: 'That\'s it!',
-    content: 'You\'re ready to explore! You can restart this tour anytime from the help menu.',
+    title: 'All Set!',
+    content: 'You’re ready to explore! The app is fully mobile-friendly—use the menu to navigate, and tap the ? button anytime for help or to restart this tour.',
   },
 ];
 
