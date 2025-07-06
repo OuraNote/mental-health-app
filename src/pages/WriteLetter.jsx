@@ -70,6 +70,7 @@ function WriteLetter() {
       return JSON.parse(localStorage.getItem('isPremium') || 'false');
     } catch { return false; }
   })();
+  const [unlockDateError, setUnlockDateError] = useState(false);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -166,7 +167,11 @@ function WriteLetter() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title || !content || !unlockDate) return;
+    if (!title || !content || !unlockDate) {
+      if (!unlockDate) setUnlockDateError(true);
+      return;
+    }
+    setUnlockDateError(false);
     setIsAnalyzing(true);
     try {
       // Analyze sentiment
@@ -422,10 +427,15 @@ function WriteLetter() {
                     <DatePicker
                       label="Unlock Date"
                       value={unlockDate}
-                      onChange={setUnlockDate}
+                      onChange={date => { setUnlockDate(date); setUnlockDateError(false); }}
                       minDate={new Date()}
-                      renderInput={(params) => <TextField {...params} fullWidth required />}
+                      renderInput={(params) => <TextField {...params} fullWidth required error={unlockDateError} />}
                     />
+                    {unlockDateError && (
+                      <Typography color="error" sx={{ mt: 1, fontSize: '0.95rem' }}>
+                        Please select an unlock date.
+                      </Typography>
+                    )}
                   </LocalizationProvider>
                 </Grid>
 
