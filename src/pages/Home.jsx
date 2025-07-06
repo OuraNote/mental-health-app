@@ -134,20 +134,12 @@ function Home() {
           <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#e3f2fd', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center' }}>
               Recurring Prompts & Streaks
-              {!isPremium && <LockIcon color="warning" sx={{ ml: 1 }} />}
             </Typography>
-            {isPremium ? (
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ mb: 1 }}>You've journaled <b>{streak}</b> days in a row!</Typography>
-                <Button variant="outlined" size="small" sx={{ mt: 1 }}>Schedule a Recurring Letter</Button>
-                <Button variant="outlined" size="small" sx={{ mt: 1, ml: 2 }}>Browse Prompt Packs</Button>
-              </Box>
-            ) : (
-              <Box sx={{ textAlign: 'center', color: '#888' }}>
-                <Typography sx={{ mb: 2 }}>Upgrade to Premium to unlock recurring prompts, milestone reminders, streak tracking, and more.</Typography>
-                <Button variant="contained" color="warning" onClick={() => setPremiumPromptOpen(true)} startIcon={<LockIcon />}>Go Premium</Button>
-              </Box>
-            )}
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography sx={{ mb: 1 }}>You've journaled <b>{streak}</b> days in a row!</Typography>
+              <Button variant="outlined" size="small" sx={{ mt: 1 }}>Schedule a Recurring Letter</Button>
+              <Button variant="outlined" size="small" sx={{ mt: 1, ml: 2 }}>Browse Prompt Packs</Button>
+            </Box>
           </Paper>
           <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#f3e5f5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center' }}>
