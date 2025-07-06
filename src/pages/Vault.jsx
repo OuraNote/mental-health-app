@@ -270,13 +270,20 @@ function Vault() {
                               </Typography>
                               <List dense>
                                 <ListItem disablePadding>
-                                  <Checkbox
-                                    checked={task.completed}
-                                    onChange={() => completeTask(task.id)}
-                                    disabled={task.completed}
-                                  />
+                                  {isLetterUnlocked(letter) ? (
+                                    <Checkbox
+                                      checked={task.completed}
+                                      onChange={() => completeTask(task.id)}
+                                      disabled={task.completed}
+                                    />
+                                  ) : (
+                                    <Checkbox
+                                      checked={false}
+                                      disabled
+                                    />
+                                  )}
                                   <ListItemText
-                                    primary={task.completed ? 'Completed' : 'Mark as complete to unlock'}
+                                    primary={task.completed ? 'Completed' : (isLetterUnlocked(letter) ? 'Mark as complete to unlock' : 'Locked')}
                                   />
                                 </ListItem>
                               </List>
