@@ -188,18 +188,18 @@ function GrowthLens() {
       minHeight: '100vh',
       background: '#e0f7fa',
       backgroundImage: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
-      py: { xs: 3, sm: 6 },
+      py: { xs: 3, md: 6 },
       boxSizing: 'border-box',
       width: '100%',
     }}>
-      <Container maxWidth="sm" sx={{ px: 1, width: '100%', boxSizing: 'border-box' }}>
+      <Container maxWidth="lg" sx={{ px: { xs: 1, md: 3 }, width: '100%', boxSizing: 'border-box' }}>
         <Fade in={show} timeout={1200}>
           <Box>
-            <Typography variant="h3" sx={{ fontWeight: 800, mb: 2, color: 'primary.main', letterSpacing: 1, textAlign: 'center', fontSize: { xs: '1.4rem', sm: '2.2rem' }, overflowWrap: 'break-word' }}>
+            <Typography variant="h3" sx={{ fontWeight: 800, mb: { xs: 2, md: 4 }, color: 'primary.main', letterSpacing: 1, textAlign: 'center', fontSize: { xs: '1.4rem', md: '2.4rem' }, overflowWrap: 'break-word' }}>
               GrowthLens: Your Emotional & Personal Growth Journey
             </Typography>
-            <Paper elevation={6} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, mb: 3, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: 400, mx: 'auto', boxSizing: 'border-box' }}>
-              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', sm: '1.25rem' }, overflowWrap: 'break-word', mb: 1 }}>Word Cloud (Values & Goals)</Typography>
+            <Paper elevation={6} sx={{ p: { xs: 2, md: 4 }, borderRadius: 6, mb: { xs: 3, md: 5 }, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: { xs: 400, md: 700 }, mx: 'auto', boxSizing: 'border-box' }}>
+              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', md: '1.5rem' }, overflowWrap: 'break-word', mb: 1 }}>Word Cloud (Values & Goals)</Typography>
               <Box
                 ref={spotlightRefs?.growthWordCloud}
                 sx={{ height: 220, bgcolor: '#f5f5f5', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', p: 2 }}
@@ -222,8 +222,8 @@ function GrowthLens() {
                 )}
               </Box>
             </Paper>
-            <Paper elevation={6} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, mb: 3, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: 400, mx: 'auto', boxSizing: 'border-box' }}>
-              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', sm: '1.25rem' }, overflowWrap: 'break-word', mb: 1 }}>Emotion Heatmap</Typography>
+            <Paper elevation={6} sx={{ p: { xs: 2, md: 4 }, borderRadius: 6, mb: { xs: 3, md: 5 }, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: { xs: 400, md: 700 }, mx: 'auto', boxSizing: 'border-box' }}>
+              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', md: '1.5rem' }, overflowWrap: 'break-word', mb: 1 }}>Emotion Heatmap</Typography>
               <Box sx={{ height: 60, bgcolor: '#f5f5f5', borderRadius: 2, display: 'flex', alignItems: 'center', p: 2, overflowX: 'auto' }}>
                 {moodTimeline.length === 0 ? (
                   <Typography color="text.secondary">[No mood data yet]</Typography>
@@ -246,8 +246,8 @@ function GrowthLens() {
                 )}
               </Box>
             </Paper>
-            <Paper elevation={6} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, mb: 3, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: 400, mx: 'auto', boxSizing: 'border-box' }}>
-              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', sm: '1.25rem' }, overflowWrap: 'break-word', mb: 1 }}>Mood Frequency</Typography>
+            <Paper elevation={6} sx={{ p: { xs: 2, md: 4 }, borderRadius: 6, mb: { xs: 3, md: 5 }, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: { xs: 400, md: 700 }, mx: 'auto', boxSizing: 'border-box' }}>
+              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', md: '1.5rem' }, overflowWrap: 'break-word', mb: 1 }}>Mood Frequency</Typography>
               <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 120, bgcolor: '#f5f5f5', borderRadius: 2, p: 2, overflowX: 'auto' }}>
                 {MOOD_DISPLAY.map(({ key, color }) => {
                   const count = moodFrequency[key] || 0;
@@ -281,8 +281,8 @@ function GrowthLens() {
                 </Typography>
               )}
             </Paper>
-            <Paper elevation={6} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, mb: 3, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: 400, mx: 'auto', boxSizing: 'border-box' }}>
-              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', sm: '1.25rem' }, overflowWrap: 'break-word', mb: 1 }}>Focus Radar: Your Values & Goals</Typography>
+            <Paper elevation={6} sx={{ p: { xs: 2, md: 4 }, borderRadius: 6, mb: { xs: 3, md: 5 }, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: { xs: 400, md: 700 }, mx: 'auto', boxSizing: 'border-box' }}>
+              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', md: '1.5rem' }, overflowWrap: 'break-word', mb: 1 }}>Focus Radar: Your Values & Goals</Typography>
               <Box sx={{ height: 320, maxWidth: 480, mx: 'auto' }}>
                 <Radar
                   data={radarData}
@@ -308,8 +308,8 @@ function GrowthLens() {
                 This chart shows how your writing focuses on different values or goals. A more balanced shape means diverse focus; a spiky shape means strong focus on a few areas.
               </Typography>
             </Paper>
-            <Paper elevation={6} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, mb: 3, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: 400, mx: 'auto', boxSizing: 'border-box' }}>
-              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', sm: '1.25rem' }, overflowWrap: 'break-word', mb: 1 }}>Growth Score</Typography>
+            <Paper elevation={6} sx={{ p: { xs: 2, md: 4 }, borderRadius: 6, mb: { xs: 3, md: 5 }, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: { xs: 400, md: 700 }, mx: 'auto', boxSizing: 'border-box' }}>
+              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', md: '1.5rem' }, overflowWrap: 'break-word', mb: 1 }}>Growth Score</Typography>
               <Box sx={{ height: 120, bgcolor: '#f5f5f5', borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <Box sx={{ position: 'relative', display: 'inline-flex', mb: 1 }}>
                   <svg width="100" height="100">
@@ -331,8 +331,8 @@ function GrowthLens() {
                 </Typography>
               </Box>
             </Paper>
-            <Paper elevation={6} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, mb: 3, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: 400, mx: 'auto', boxSizing: 'border-box' }}>
-              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', sm: '1.25rem' }, overflowWrap: 'break-word', mb: 1 }}>AI Reflections & Insights</Typography>
+            <Paper elevation={6} sx={{ p: { xs: 2, md: 4 }, borderRadius: 6, mb: { xs: 3, md: 5 }, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: { xs: 400, md: 700 }, mx: 'auto', boxSizing: 'border-box' }}>
+              <Typography variant="h6" sx={{ textAlign: 'center', fontSize: { xs: '1.1rem', md: '1.5rem' }, overflowWrap: 'break-word', mb: 1 }}>AI Reflections & Insights</Typography>
               {isPremium ? (
                 <Box>
                   <Typography sx={{ mb: 2 }}>{aiFeedback}</Typography>
