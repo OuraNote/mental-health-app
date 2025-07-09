@@ -106,36 +106,39 @@ function Home() {
       alignItems: 'center',
       justifyContent: 'center',
       py: { xs: 2, sm: 6 },
-      px: { xs: 1, sm: 0 },
+      px: { xs: 2, sm: 0 },
+      pb: { xs: 10, sm: 6 },
+      boxSizing: 'border-box',
+      width: '100%',
     }}>
       <Fade in={show} timeout={1200}>
-        <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 6 }, width: '100%' }}>
-          <Typography variant="h2" sx={{ fontWeight: 800, mb: { xs: 1, sm: 2 }, color: 'primary.main', letterSpacing: 1, fontSize: { xs: '2rem', sm: '2.8rem' } }}>
+        <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 6 }, width: '100%', boxSizing: 'border-box' }}>
+          <Typography variant="h2" sx={{ fontWeight: 800, mb: { xs: 1, sm: 2 }, color: 'primary.main', letterSpacing: 1, fontSize: { xs: '1.5rem', sm: '2.8rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
             Welcome to Your Time Capsule
           </Typography>
-          <Typography variant="h5" color="text.secondary" sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1.1rem', sm: '1.5rem' } }}>
+          <Typography variant="h5" color="text.secondary" sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1rem', sm: '1.5rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
             Reflect, grow, and connect with your future self in a safe, beautiful space.
           </Typography>
-          <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#fffbe7', display: 'flex', flexDirection: 'column', alignItems: 'center', width: { xs: '100%', sm: 'auto' } }}>
-            <LightbulbIcon sx={{ color: '#FFD600', fontSize: { xs: 28, sm: 36 }, mb: 1 }} />
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>Daily Reflection Prompt</Typography>
-            <Typography sx={{ fontSize: { xs: '1rem', sm: '1.15rem' }, mb: 2, color: '#555' }}>{PROMPTS[promptIdx]}</Typography>
-            <Button variant="outlined" size="small" onClick={handleNewPrompt} sx={{ fontSize: { xs: '1rem', sm: '1.1rem' }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }}>New Prompt</Button>
+          <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 400, mx: 'auto', background: '#fffbe7', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
+            <LightbulbIcon sx={{ color: '#FFD600', fontSize: { xs: 24, sm: 36 }, mb: 1 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1rem', sm: '1.25rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>Daily Reflection Prompt</Typography>
+            <Typography sx={{ fontSize: { xs: '0.95rem', sm: '1.15rem' }, mb: 2, color: '#555', maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>{PROMPTS[promptIdx]}</Typography>
+            <Button variant="outlined" size="small" onClick={handleNewPrompt} sx={{ fontSize: { xs: '0.95rem', sm: '1.1rem' }, px: { xs: 0, sm: 4 }, py: { xs: 1, sm: 1.5 }, width: '100%', boxSizing: 'border-box', maxWidth: '100%' }}>New Prompt</Button>
           </Paper>
-          <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 500, mx: 'auto', background: '#f3e5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', width: { xs: '100%', sm: 'auto' } }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' }, display: 'flex', alignItems: 'center' }}>
+          <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 400, mx: 'auto', background: '#f3e5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1rem', sm: '1.25rem' }, display: 'flex', alignItems: 'center', maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
               Mobile Premium Features
             </Typography>
-            <Typography sx={{ mb: 2, color: '#888', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
+            <Typography sx={{ mb: 2, color: '#888', fontSize: { xs: '0.9rem', sm: '1.1rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
               Coming Soon
             </Typography>
-            <Typography sx={{ mb: 3, color: '#888', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
+            <Typography sx={{ mb: 3, color: '#888', fontSize: { xs: '0.9rem', sm: '1.1rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
               Enjoy offline access, push notification prompts, voice-to-letter transcription, and widgets in a future update!
             </Typography>
-            <Button variant="outlined" size="small" sx={{ mt: 1, mb: 1, fontSize: { xs: '0.95rem', sm: '1.1rem' }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }} disabled>
+            <Button variant="outlined" size="small" sx={{ mt: 1, mb: 1, fontSize: { xs: '0.9rem', sm: '1.1rem' }, px: { xs: 0, sm: 4 }, py: { xs: 1, sm: 1.5 }, width: '100%', boxSizing: 'border-box', maxWidth: '100%' }} disabled>
               ENABLE OFFLINE MODE
             </Button>
-            <Button variant="outlined" size="small" sx={{ mb: 1, fontSize: { xs: '0.95rem', sm: '1.1rem' }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }} disabled>
+            <Button variant="outlined" size="small" sx={{ mb: 1, fontSize: { xs: '0.9rem', sm: '1.1rem' }, px: { xs: 0, sm: 4 }, py: { xs: 1, sm: 1.5 }, width: '100%', boxSizing: 'border-box', maxWidth: '100%' }} disabled>
               SET UP WIDGETS
             </Button>
           </Paper>
@@ -145,23 +148,23 @@ function Home() {
               variant="contained"
               size="large"
               color="primary"
-              sx={{ borderRadius: 32, px: { xs: 3, sm: 6 }, py: { xs: 1.5, sm: 2 }, fontSize: { xs: '1.1rem', sm: '1.3rem' }, fontWeight: 700, boxShadow: 3, width: { xs: '100%', sm: 'auto' } }}
+              sx={{ borderRadius: 32, px: { xs: 3, sm: 6 }, py: { xs: 1.5, sm: 2 }, fontSize: { xs: '1rem', sm: '1.3rem' }, fontWeight: 700, boxShadow: 3, width: '100%', maxWidth: '100%', boxSizing: 'border-box', mb: { xs: 1.5, sm: 0 } }}
               onClick={() => navigate('/write')}
             >
               Get Started
             </Button>
           </Tooltip>
-          <Button onClick={startSpotlightTour} sx={{ ml: { xs: 0, sm: 2 }, mt: 2, width: { xs: '100%', sm: 'auto' }, fontSize: { xs: '1rem', sm: '1.1rem' } }} variant="outlined">Start Spotlight Tour</Button>
+          <Button onClick={startSpotlightTour} sx={{ ml: { xs: 0, sm: 2 }, mt: 2, width: '100%', fontSize: { xs: '0.95rem', sm: '1.1rem' }, maxWidth: '100%', boxSizing: 'border-box' }} variant="outlined">Start Spotlight Tour</Button>
         </Box>
       </Fade>
-      <Grid container spacing={4} justifyContent="center" sx={{ maxWidth: 900, px: { xs: 0.5, sm: 3 } }}>
+      <Grid container spacing={3} justifyContent="center" sx={{ maxWidth: 900, px: { xs: 1, sm: 3 }, mt: { xs: 0, sm: 2 }, boxSizing: 'border-box' }}>
         {features.map((feature, idx) => (
-          <Grid item xs={12} sm={6} md={4} key={feature.title}>
+          <Grid item xs={12} sm={6} md={4} key={feature.title} sx={{ mb: { xs: 2, sm: 0 } }}>
             <Fade in={show} style={{ transitionDelay: `${400 + idx * 200}ms` }}>
-              <Paper elevation={4} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, textAlign: 'center', minHeight: { xs: 160, sm: 220 }, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 4px 24px 0 rgba(110,198,255,0.10)', width: '100%' }}>
+              <Paper elevation={4} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 6, textAlign: 'center', minHeight: { xs: 160, sm: 220 }, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 4px 24px 0 rgba(110,198,255,0.10)', width: '100%', maxWidth: 400, mx: 'auto', boxSizing: 'border-box', mb: { xs: 2, sm: 0 } }}>
                 <Box sx={{ mb: 2 }}>{feature.icon}</Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>{feature.title}</Typography>
-                <Typography color="text.secondary" sx={{ mb: 2, fontSize: { xs: '0.98rem', sm: '1.1rem' } }}>{feature.description}</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1rem', sm: '1.25rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>{feature.title}</Typography>
+                <Typography color="text.secondary" sx={{ mb: 2, fontSize: { xs: '0.95rem', sm: '1.1rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>{feature.description}</Typography>
                 <Tooltip title={`Learn more about ${feature.title}`} arrow>
                   <Button
                     ref={
@@ -169,7 +172,20 @@ function Home() {
                       feature.title === 'Secure Vault' ? spotlightRefs?.exploreVault :
                       feature.title === 'Emotional Timeline' ? spotlightRefs?.exploreTimeline : undefined
                     }
-                    variant="outlined" color="primary" sx={{ borderRadius: 24, fontWeight: 600, fontSize: { xs: '1rem', sm: '1.1rem' }, width: { xs: '100%', sm: 'auto' }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }} onClick={() => navigate(feature.path)}>
+                    variant="outlined" color="primary"
+                    sx={{
+                      borderRadius: { xs: 2, sm: 24 },
+                      fontWeight: 600,
+                      fontSize: { xs: '0.95rem', sm: '1.1rem' },
+                      width: '100%',
+                      px: { xs: 0, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      boxSizing: 'border-box',
+                      mt: 1,
+                      maxWidth: '100%',
+                    }}
+                    onClick={() => navigate(feature.path)}
+                  >
                     Explore
                   </Button>
                 </Tooltip>
