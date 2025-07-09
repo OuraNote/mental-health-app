@@ -13,7 +13,6 @@ import {
   Typography,
   Button,
   Chip,
-  Fab,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -29,8 +28,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
 import GoogleIcon from '@mui/icons-material/Google';
-import StarIcon from '@mui/icons-material/Star';
-import ChatIcon from '@mui/icons-material/Chat';
 import Switch from '@mui/material/Switch';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -38,6 +35,12 @@ import { useContext } from 'react';
 import { ThemeToggleContext } from '../App';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, sendEmailVerification } from 'firebase/auth';
+import { useAppStore } from '../store';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 const drawerWidth = 240;
 
@@ -48,7 +51,20 @@ const menuItems = [
   { text: 'Timeline', icon: <TimelineIcon />, path: '/timeline' },
   { text: 'GrowthLens', icon: <TimelineIcon />, path: '/growthlens' },
   { text: 'Letter Wall', icon: <LockIcon />, path: '/wall' },
-  { text: 'AI Insights', icon: <PsychologyIcon />, path: '/insights' },
+  // { text: 'AI Insights', icon: <PsychologyIcon />, path: '/insights' },
+];
+
+// Limit bottom nav to 5 main tabs, move others to 'More'
+const bottomNavItems = [
+  { text: 'Home', icon: <HomeIcon />, path: '/' },
+  { text: 'Write', icon: <EditIcon />, path: '/write' },
+  { text: 'Vault', icon: <LockIcon />, path: '/vault' },
+  { text: 'Timeline', icon: <TimelineIcon />, path: '/timeline' },
+  { text: 'More', icon: <MoreHorizIcon />, path: '/more' },
+];
+const moreMenuItems = [
+  { text: 'GrowthLens', icon: <TimelineIcon />, path: '/growthlens' },
+  { text: 'Letter Wall', icon: <LockIcon />, path: '/wall' },
 ];
 
 function Layout({ children }) {
@@ -64,16 +80,13 @@ function Layout({ children }) {
       return JSON.parse(localStorage.getItem('user') || 'null');
     } catch { return null; }
   });
-  const [premiumOpen, setPremiumOpen] = useState(false);
-  const [isPremium, setIsPremium] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('isPremium') || 'false');
-    } catch { return false; }
-  });
-  const [aiCoachOpen, setAiCoachOpen] = useState(false);
-  const [aiCoachPromptOpen, setAiCoachPromptOpen] = useState(false);
   const { useModernTheme, toggleTheme } = useContext(ThemeToggleContext);
   const [authError, setAuthError] = useState('');
+  const loadLetters = useAppStore(state => state.loadLetters);
+  const clearLetters = useAppStore(state => state.clearLetters);
+  const [moreAnchorEl, setMoreAnchorEl] = useState(null);
+  const handleMoreOpen = (event) => setMoreAnchorEl(event.currentTarget);
+  const handleMoreClose = () => setMoreAnchorEl(null);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -84,16 +97,21 @@ function Layout({ children }) {
     try {
       if (authTab === 'signin') {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        if (!userCredential.user.emailVerified) {
+          setAuthError('Please verify your email before signing in. A new verification email has been sent.');
+          await sendEmailVerification(userCredential.user);
+          return;
+        }
         setUser({ email: userCredential.user.email });
         localStorage.setItem('user', JSON.stringify({ email: userCredential.user.email }));
         setAuthOpen(false);
+        await loadLetters();
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        setUser({ email: userCredential.user.email });
-        localStorage.setItem('user', JSON.stringify({ email: userCredential.user.email }));
         await sendEmailVerification(userCredential.user);
-        setAuthError('A verification email has been sent to your email address. Please check your inbox.');
-        setAuthOpen(false);
+        setAuthError('A verification email has been sent to your email address. Please check your inbox and verify before signing in.');
+        setPassword('');
+        // Do NOT set user as logged in or close dialog yet
       }
     } catch (error) {
       setAuthError(error.message);
@@ -103,6 +121,7 @@ function Layout({ children }) {
     await signOut(auth);
     setUser(null);
     localStorage.removeItem('user');
+    clearLetters();
   };
   const handleGoogleSignIn = () => {
     // Mock Google OAuth
@@ -110,12 +129,6 @@ function Layout({ children }) {
     setUser(mockUser);
     localStorage.setItem('user', JSON.stringify(mockUser));
     setAuthOpen(false);
-  };
-
-  const handleUpgrade = () => {
-    setIsPremium(true);
-    localStorage.setItem('isPremium', 'true');
-    setPremiumOpen(false);
   };
 
   const handlePasswordReset = async () => {
@@ -161,110 +174,103 @@ function Layout({ children }) {
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
+          pt: { xs: 'env(safe-area-inset-top)', sm: 0 },
+          pb: { xs: 0.5, sm: 0 },
         }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+        <Toolbar sx={{ flexWrap: 'wrap', gap: 1, minHeight: { xs: 48, sm: 64 }, px: { xs: 1, sm: 2 } }}>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
             Mental Health Time Capsule
           </Typography>
-          <LightModeIcon sx={{ color: useModernTheme ? 'primary.main' : 'grey.500' }} />
-          <Switch
-            checked={useModernTheme}
-            onChange={toggleTheme}
-            color="primary"
-            inputProps={{ 'aria-label': 'theme switch' }}
-          />
-          <DarkModeIcon sx={{ color: !useModernTheme ? 'primary.main' : 'grey.500' }} />
-          {isPremium && (
-            <Chip icon={<StarIcon sx={{ color: '#FFD600' }} />} label="Premium" color="warning" sx={{ mr: 2, fontWeight: 700 }} />
-          )}
-          <Button color="inherit" onClick={() => setPremiumOpen(true)} sx={{ mr: 1 }}>
-            Go Premium
-          </Button>
+          {/* Theme switcher - hide on very small screens */}
+          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
+            <LightModeIcon sx={{ color: useModernTheme ? 'primary.main' : 'grey.500' }} />
+            <Switch
+              checked={useModernTheme}
+              onChange={toggleTheme}
+              color="primary"
+              inputProps={{ 'aria-label': 'theme switch' }}
+              size="small"
+            />
+            <DarkModeIcon sx={{ color: !useModernTheme ? 'primary.main' : 'grey.500' }} />
+          </Box>
           {user ? (
             <>
-              <Typography sx={{ mr: 2 }}>{user.name || user.email}</Typography>
-              <Button color="inherit" onClick={handleSignOut}>Sign Out</Button>
+              <Typography sx={{ mr: 1, display: { xs: 'none', sm: 'block' } }}>
+                {user.name || user.email}
+              </Typography>
+              <Button 
+                color="inherit" 
+                onClick={handleSignOut}
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+              >
+                Sign Out
+              </Button>
             </>
           ) : (
-            <Button color="inherit" onClick={() => setAuthOpen(true)}>Sign In / Sign Up</Button>
+            <Button 
+              color="inherit" 
+              onClick={() => setAuthOpen(true)}
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            >
+              Sign In
+            </Button>
           )}
         </Toolbar>
       </AppBar>
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-      >
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
+      {/* Permanent Drawer for desktop only */}
+      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 }, display: { xs: 'none', sm: 'block' } }}>
         <Drawer
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-            },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
           open
         >
           {drawer}
         </Drawer>
       </Box>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: { xs: 1, sm: 3 },
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          minHeight: '100vh',
-        }}
-      >
+
+      {/* Main content area */}
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: '100%', mb: { xs: 7, sm: 0 } }}>
         <Toolbar />
         {children}
       </Box>
-      <Fab
-        color="primary"
-        aria-label="AI Coach"
-        sx={{ position: 'fixed', bottom: 32, right: 32, zIndex: 1200 }}
-        onClick={() => {
-          if (!isPremium) {
-            setAiCoachPromptOpen(true);
-            return;
-          }
-          setAiCoachOpen(true);
-        }}
-      >
-        <ChatIcon />
-      </Fab>
+
+      {/* Bottom Navigation for mobile only */}
+      <Box sx={{ display: { xs: 'block', sm: 'none' }, position: 'fixed', bottom: 24, left: 0, right: 0, zIndex: 1201, borderTop: 1, borderColor: 'divider', background: '#fff', pb: 1 }}>
+        <BottomNavigation
+          showLabels={false}
+          value={bottomNavItems.findIndex(item => (item.path === '/more' ? moreMenuItems.some(m => m.path === location.pathname) : item.path === location.pathname))}
+          onChange={(event, newValue) => {
+            if (bottomNavItems[newValue].text === 'More') {
+              setMoreAnchorEl(event.currentTarget);
+            } else {
+              navigate(bottomNavItems[newValue].path);
+            }
+          }}
+          sx={{ height: 60 }}
+        >
+          {bottomNavItems.map((item, idx) => (
+            <BottomNavigationAction key={item.text} icon={item.icon} />
+          ))}
+        </BottomNavigation>
+        <Menu
+          anchorEl={moreAnchorEl}
+          open={Boolean(moreAnchorEl)}
+          onClose={handleMoreClose}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          {moreMenuItems.map((item) => (
+            <MenuItem key={item.text} onClick={() => { navigate(item.path); handleMoreClose(); }}>
+              {item.icon}
+              <span style={{ marginLeft: 8 }}>{item.text}</span>
+            </MenuItem>
+          ))}
+        </Menu>
+      </Box>
       <Dialog open={authOpen} onClose={() => setAuthOpen(false)}>
         <DialogTitle>{authTab === 'signin' ? 'Sign In' : 'Sign Up'}</DialogTitle>
         <DialogContent sx={{ minWidth: 320 }}>
@@ -307,68 +313,6 @@ function Layout({ children }) {
           </Button>
           <Button variant="contained" onClick={handleSignIn}>
             {authTab === 'signin' ? 'Sign In' : 'Sign Up'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={premiumOpen} onClose={() => setPremiumOpen(false)}>
-        <DialogTitle>Unlock Premium Features</DialogTitle>
-        <DialogContent sx={{ minWidth: 350 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <StarIcon sx={{ color: '#FFD600', fontSize: 32, mr: 1 }} />
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>Premium Benefits</Typography>
-          </Box>
-          <ul style={{ margin: 0, paddingLeft: 20, color: '#444', fontSize: '1.08rem' }}>
-            <li>Unlimited storage & attachments</li>
-            <li>Memory Capsule collections</li>
-            <li>Export to PDF/video time capsule</li>
-            <li>AI reflections & insights</li>
-            <li>Recurring prompts & reminders</li>
-            <li>Premium Letter Wall categories</li>
-            <li>Offline access & mobile widgets</li>
-            <li>And more!</li>
-          </ul>
-          <Box sx={{ mt: 3, mb: 1, textAlign: 'center' }}>
-            <Typography variant="h5" color="primary" sx={{ fontWeight: 800 }}>$4.99/mo</Typography>
-            <Typography color="text.secondary">or $39.99/year • $14.99 lifetime</Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setPremiumOpen(false)}>Cancel</Button>
-          <Button variant="contained" color="warning" onClick={handleUpgrade} startIcon={<StarIcon />}>
-            Upgrade Now
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={aiCoachOpen} onClose={() => setAiCoachOpen(false)}>
-        <DialogTitle>AI Coach (Premium)</DialogTitle>
-        <DialogContent>
-          <Typography sx={{ mb: 2 }}>This is your AI-powered journaling assistant. Ask for suggestions, affirmations, or guidance!</Typography>
-          <Box sx={{ bgcolor: '#f5f5f5', p: 2, borderRadius: 2, minHeight: 120, mb: 2 }}>
-            <Typography color="text.secondary">[Mock chat interface coming soon]</Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAiCoachOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={aiCoachPromptOpen} onClose={() => setAiCoachPromptOpen(false)}>
-        <DialogTitle>Premium Feature</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <LockIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>AI Coach Add-On</Typography>
-          </Box>
-          <Typography sx={{ mb: 2 }}>
-            Upgrade to Premium to chat with your AI-powered journaling assistant for real-time suggestions and affirmations.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAiCoachPromptOpen(false)}>Cancel</Button>
-          <Button variant="contained" color="warning" onClick={() => {
-            setAiCoachPromptOpen(false);
-            window.dispatchEvent(new Event('openPremiumModal'));
-          }}>
-            Go Premium
           </Button>
         </DialogActions>
       </Dialog>
