@@ -1,9 +1,15 @@
 import { Box, Typography, Paper, Stack, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function DiaryVault() {
   const [entries, setEntries] = useState(() => JSON.parse(localStorage.getItem('diaryEntries') || '[]'));
+  useEffect(() => {
+    const handle = () => setEntries(JSON.parse(localStorage.getItem('diaryEntries') || '[]'));
+    window.addEventListener('focus', handle);
+    handle();
+    return () => window.removeEventListener('focus', handle);
+  }, []);
   const handleDelete = (id) => {
     const updated = entries.filter(e => e.id !== id);
     localStorage.setItem('diaryEntries', JSON.stringify(updated));
