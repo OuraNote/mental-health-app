@@ -46,26 +46,26 @@ const drawerWidth = 240;
 
 const menuItems = [
   { text: 'Home', icon: <HomeIcon />, path: '/' },
+  { text: 'Write Diary', icon: <EditIcon />, path: '/diary' },
   { text: 'Write Letter', icon: <EditIcon />, path: '/write' },
-  { text: 'Daily Diary', icon: <EditIcon />, path: '/diary' },
-  { text: 'Letter Vault', icon: <LockIcon />, path: '/vault' },
   { text: 'Diary Vault', icon: <LockIcon />, path: '/diary-vault' },
+  { text: 'Letter Vault', icon: <LockIcon />, path: '/vault' },
   { text: 'Timeline', icon: <TimelineIcon />, path: '/timeline' },
-  // Removed GrowthLens
 ];
 
-// Limit bottom nav to 5 main tabs, move others to 'More'
+// Limit bottom nav to 4 main tabs, move vaults to 'More'
 const bottomNavItems = [
   { text: 'Home', icon: <HomeIcon />, path: '/' },
-  { text: 'Write', icon: <EditIcon />, path: '/write' },
-  { text: 'Vault', icon: <LockIcon />, path: '/vault' },
+  { text: 'Diary', icon: <EditIcon />, path: '/diary' },
+  { text: 'Letter', icon: <EditIcon />, path: '/write' },
   { text: 'Timeline', icon: <TimelineIcon />, path: '/timeline' },
   { text: 'More', icon: <MoreHorizIcon />, path: '/more' },
 ];
 const moreMenuItems = [
-  { text: 'GrowthLens', icon: <TimelineIcon />, path: '/growthlens' },
-  { text: 'Letter Wall', icon: <LockIcon />, path: '/wall' },
+  { text: 'Diary Vault', icon: <LockIcon />, path: '/diary-vault' },
+  { text: 'Letter Vault', icon: <LockIcon />, path: '/vault' },
 ];
+// No moreMenuItems needed since all features are in main nav
 
 function Layout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -239,9 +239,9 @@ function Layout({ children }) {
         </Box>
 
       {/* Bottom Navigation for mobile only */}
-      <Box sx={{ display: { xs: 'block', sm: 'none' }, position: 'fixed', bottom: 24, left: 0, right: 0, zIndex: 1201, borderTop: 1, borderColor: 'divider', background: '#fff', pb: 1 }}>
+      <Box sx={{ display: { xs: 'block', sm: 'none' }, position: 'fixed', bottom: 16, left: 0, right: 0, zIndex: 1201, borderTop: 1, borderColor: 'divider', background: '#fff', pb: 3 }}>
         <BottomNavigation
-          showLabels={false}
+          showLabels={true}
           value={bottomNavItems.findIndex(item => (item.path === '/more' ? moreMenuItems.some(m => m.path === location.pathname) : item.path === location.pathname))}
           onChange={(event, newValue) => {
             if (bottomNavItems[newValue].text === 'More') {
@@ -253,7 +253,7 @@ function Layout({ children }) {
           sx={{ height: 60 }}
         >
           {bottomNavItems.map((item, idx) => (
-            <BottomNavigationAction key={item.text} icon={item.icon} />
+            <BottomNavigationAction key={item.text} label={item.text} icon={item.icon} />
           ))}
         </BottomNavigation>
         <Menu
