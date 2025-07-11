@@ -50,6 +50,7 @@ function Vault() {
   const completeTask = useAppStore(state => state.completeTask);
   const getTask = useAppStore(state => state.getTask);
   const getLetter = useAppStore(state => state.getLetter);
+  const loadLetters = useAppStore(state => state.loadLetters);
 
   const [selectedLetter, setSelectedLetter] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -71,6 +72,7 @@ function Vault() {
       return JSON.parse(localStorage.getItem('isPremium') || 'false');
     } catch { return false; }
   })();
+  const [loading, setLoading] = useState(false);
 
   const { spotlightRefs } = useContext(SpotlightTourContext) || {};
 
@@ -185,15 +187,24 @@ function Vault() {
 
   const handleDeleteLetter = async (letterId) => {
     if (window.confirm('Are you sure you want to delete this letter? This cannot be undone.')) {
+      setLoading(true);
       await deleteLetter(letterId);
-      // Reload letters for extra reliability
-      if (useAppStore.getState().loadLetters) {
-        await useAppStore.getState().loadLetters();
+      if (loadLetters) {
+        await loadLetters();
       }
       setSnackbar({ open: true, message: 'Letter deleted.' });
       setRefreshKey(k => k + 1);
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (!letters) {
     return (
