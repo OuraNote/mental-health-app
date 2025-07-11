@@ -47,11 +47,11 @@ const drawerWidth = 240;
 const menuItems = [
   { text: 'Home', icon: <HomeIcon />, path: '/' },
   { text: 'Write Letter', icon: <EditIcon />, path: '/write' },
-  { text: 'Vault', icon: <LockIcon />, path: '/vault' },
+  { text: 'Daily Diary', icon: <EditIcon />, path: '/diary' },
+  { text: 'Letter Vault', icon: <LockIcon />, path: '/vault' },
+  { text: 'Diary Vault', icon: <LockIcon />, path: '/diary-vault' },
   { text: 'Timeline', icon: <TimelineIcon />, path: '/timeline' },
-  { text: 'GrowthLens', icon: <TimelineIcon />, path: '/growthlens' },
-  { text: 'Letter Wall', icon: <LockIcon />, path: '/wall' },
-  // { text: 'AI Insights', icon: <PsychologyIcon />, path: '/insights' },
+  // Removed GrowthLens
 ];
 
 // Limit bottom nav to 5 main tabs, move others to 'More'
@@ -235,8 +235,8 @@ function Layout({ children }) {
       {/* Main content area */}
       <Box component="main" sx={{ flexGrow: 1, p: 3, width: '100%', mb: { xs: 7, sm: 0 } }}>
         <Toolbar />
-        {children}
-      </Box>
+          {children}
+        </Box>
 
       {/* Bottom Navigation for mobile only */}
       <Box sx={{ display: { xs: 'block', sm: 'none' }, position: 'fixed', bottom: 24, left: 0, right: 0, zIndex: 1201, borderTop: 1, borderColor: 'divider', background: '#fff', pb: 1 }}>
