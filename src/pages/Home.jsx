@@ -119,11 +119,14 @@ function Home() {
           <Typography variant="h5" color="text.secondary" sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1rem', sm: '1.5rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
             Reflect, grow, and connect with your future self in a safe, beautiful space.
           </Typography>
-          <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 400, mx: 'auto', background: '#fffbe7', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
-            <LightbulbIcon sx={{ color: '#FFD600', fontSize: { xs: 24, sm: 36 }, mb: 1 }} />
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1rem', sm: '1.25rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>Daily Reflection Prompt</Typography>
-            <Typography sx={{ fontSize: { xs: '0.95rem', sm: '1.15rem' }, mb: 2, color: '#555', maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>{PROMPTS[promptIdx]}</Typography>
-            <Button variant="outlined" size="small" onClick={handleNewPrompt} sx={{ fontSize: { xs: '0.95rem', sm: '1.1rem' }, px: { xs: 0, sm: 4 }, py: { xs: 1, sm: 1.5 }, width: '100%', boxSizing: 'border-box', maxWidth: '100%' }}>New Prompt</Button>
+          <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 400, mx: 'auto', background: '#f3e8ff', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, fontSize: { xs: '1rem', sm: '1.25rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>What would you like to do today?</Typography>
+            <Button variant="contained" color="primary" sx={{ mb: 2, width: '100%', fontSize: '1.1rem', py: 2, borderRadius: 2 }} onClick={() => navigate('/diary')}>
+              Write Daily Diary Entry
+            </Button>
+            <Button variant="outlined" color="primary" sx={{ width: '100%', fontSize: '1.1rem', py: 2, borderRadius: 2 }} onClick={() => navigate('/write')}>
+              Write Letter to Future Self
+            </Button>
           </Paper>
           <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 4 }, borderRadius: 4, maxWidth: 400, mx: 'auto', background: '#f3e5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1rem', sm: '1.25rem' }, display: 'flex', alignItems: 'center', maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
