@@ -75,6 +75,7 @@ function Vault() {
   const { spotlightRefs } = useContext(SpotlightTourContext) || {};
 
   const deleteLetter = useAppStore(state => state.deleteLetter);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useState(() => { setTimeout(() => setShow(true), 200); }, []);
 
@@ -190,6 +191,7 @@ function Vault() {
         await useAppStore.getState().loadLetters();
       }
       setSnackbar({ open: true, message: 'Letter deleted.' });
+      setRefreshKey(k => k + 1);
     }
   };
 
@@ -218,7 +220,7 @@ function Vault() {
             <Typography variant="h6" color="text.secondary" sx={{ mb: { xs: 2, sm: 4 }, textAlign: 'center', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
               All your letters are safe and private until their unlock date. Open, reflect, and grow!
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} key={refreshKey}>
               {letters.length === 0 && (
                 <Grid item xs={12}>
                   <Typography>No letters yet. Write one!</Typography>
@@ -321,28 +323,6 @@ function Vault() {
                               </Button>
                             </Tooltip>
                           )}
-                          <Tooltip title={isPremium ? 'Gift this letter' : 'Go Premium to gift letters'} arrow>
-                            <span>
-                              <Button
-                                variant="outlined"
-                                color="secondary"
-                                size="small"
-                                sx={{ mt: 1, borderRadius: 24, fontWeight: 600, fontSize: { xs: '0.95rem', sm: '1rem' } }}
-                                onClick={() => {
-                                  if (!isPremium) {
-                                    setPremiumPromptOpen(true);
-                                    return;
-                                  }
-                                  // Mock: show alert for now
-                                  alert('Gift a Letter: This feature is coming soon!');
-                                }}
-                                disabled={!isPremium}
-                                startIcon={!isPremium ? <LockIcon fontSize="small" color="warning" /> : undefined}
-                              >
-                                Gift a Letter
-                              </Button>
-                            </span>
-                          </Tooltip>
                           <Button
                             variant="outlined"
                             color="error"
