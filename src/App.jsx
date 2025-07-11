@@ -6,8 +6,9 @@ import Home from './pages/Home';
 import WriteLetter from './pages/WriteLetter';
 import Vault from './pages/Vault';
 import Timeline from './pages/Timeline';
-import GrowthLens from './pages/GrowthLens';
 import LetterWall from './pages/LetterWall';
+import DiaryEntry from './pages/DiaryEntry';
+import DiaryVault from './pages/DiaryVault';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Dialog from '@mui/material/Dialog';
@@ -213,63 +214,33 @@ const TOUR_STEPS = [
     refKey: 'getStartedBtn',
   },
   {
-    title: 'Write Letters',
-    content: 'Tap "Write Letters" to compose a private message to your future self. You can add a title, set an unlock date, and even attach an image or voice note. On mobile, use the big buttons and simple form for easy writing.',
+    title: 'Choose Your Path',
+    content: 'On the Home page, choose between writing a Daily Diary entry or a Letter to your future self. The navigation is simple: use the bottom bar on mobile or the sidebar on desktop.',
     refKey: 'exploreWrite',
   },
   {
-    title: 'Secure Vault',
-    content: 'All your letters are safely stored in the Vault. They remain private and locked until their unlock date or until you complete a linked task. Tap a card to see more details.',
+    title: 'Daily Diary',
+    content: 'Use the Daily Diary to quickly capture your thoughts and feelings. Pick an emotion, write your entry, and track your mood over time. Entries are saved privately on your device.',
+    refKey: 'exploreDiary',
+  },
+  {
+    title: 'Letters to Future Self',
+    content: 'Write a letter to your future self. Set an unlock date and revisit your thoughts later. Letters are encrypted and stored in your Vault.',
     refKey: 'exploreVault',
   },
   {
-    title: 'Emotional Timeline',
-    content: 'The Timeline visualizes your emotional journey over time. Each letter’s mood is analyzed and plotted, so you can see your growth. Pinch or scroll to zoom on mobile.',
-    refKey: 'exploreTimeline',
-  },
-  {
-    title: 'Write Letter Form',
-    content: 'This is the main form for writing a letter. Fill in your thoughts, set a date, and add optional attachments. On mobile, the form is optimized for touch and easy scrolling.',
-    refKey: 'writeLetterForm',
-  },
-  {
-    title: 'Your Vault',
-    content: 'The Vault shows all your letters. Tap a card to open, reflect, or respond. Locked letters show their unlock date and any required tasks.',
+    title: 'Vaults',
+    content: 'Access your Diary Vault and Letter Vault to view, reflect, or delete past entries and letters. Everything is private and secure.',
     refKey: 'vaultFirstCard',
   },
   {
-    title: 'Open Letter',
-    content: 'Open a letter to read your past thoughts, reflect, and even write a response to your past self. On mobile, swipe up to scroll through the letter.',
-    refKey: 'vaultOpenBtn',
-  },
-  {
-    title: 'Share Anonymously',
-    content: 'You can share a letter anonymously to inspire others on the Letter Wall. Choose tags to help others find your story.',
-    refKey: 'vaultShareBtn',
-  },
-  {
-    title: 'Timeline Chart',
-    content: 'See your moods and emotional trends over time. The chart is interactive—tap or drag to explore on mobile.',
+    title: 'Emotional Timeline',
+    content: 'The Timeline visualizes your emotional journey across both diary entries and letters. Sentiment is shown from -1 (very negative) to 1 (very positive). Track your growth and patterns over time.',
     refKey: 'timelineChart',
   },
   {
-    title: 'Word Cloud',
-    content: 'The GrowthLens word cloud shows your most frequent words and values. Bigger words mean more focus in your writing.',
-    refKey: 'growthWordCloud',
-  },
-  {
-    title: 'Filter Letters',
-    content: 'On the Letter Wall, filter anonymous letters by theme or mood. Great for finding stories that resonate with you.',
-    refKey: 'wallFilterChip',
-  },
-  {
-    title: 'Like Letters',
-    content: 'Tap the heart to like a letter that inspires you. On mobile, just tap the icon—no need to sign in.',
-    refKey: 'wallLikeBtn',
-  },
-  {
     title: 'All Set!',
-    content: 'You’re ready to explore! The app is fully mobile-friendly—use the menu to navigate, and tap the ? button anytime for help or to restart this tour.',
+    content: 'You’re ready to explore! The app is fully mobile-friendly—use the navigation bar to switch between features, and tap the ? button anytime for help or to restart this tour.',
   },
 ];
 
@@ -388,8 +359,9 @@ function App() {
               <Route path="/write" element={<WriteLetter />} />
               <Route path="/vault" element={<Vault />} />
               <Route path="/timeline" element={<Timeline />} />
-              <Route path="/growthlens" element={<GrowthLens />} />
               <Route path="/wall" element={<LetterWall />} />
+              <Route path="/diary" element={<DiaryEntry />} />
+              <Route path="/diary-vault" element={<DiaryVault />} />
             </Routes>
           </Layout>
         </Router>
