@@ -4,6 +4,23 @@ A simple, private journaling app to help you reflect, track your emotions, and c
 
 ---
 
+## 🛠️ Technologies Used
+
+- React (with Vite)
+- Material UI (MUI)
+- Zustand (state management)
+- Firebase (authentication, database)
+- Capacitor (Android/iOS hybrid app support)
+- Chart.js & react-chartjs-2 (charts)
+- date-fns (date utilities)
+- Sentiment (JavaScript sentiment analysis library)
+- CryptoJS (encryption)
+
+### 🤖 AI/ML Note
+This app uses the open-source [Sentiment](https://www.npmjs.com/package/sentiment) JavaScript library for basic sentiment analysis and emotion detection. It does **not** use a custom-trained machine learning model or external AI API. All analysis runs locally in the browser.
+
+---
+
 ## ✨ Features
 
 - **Daily Diary:** Quickly capture your thoughts and feelings each day, with emotion tracking.
