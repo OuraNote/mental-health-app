@@ -7,6 +7,7 @@ import {
 
 export const useAppStore = create(persist((set, get) => ({
   letters: [], // { id, data, unlockDate, taskId }
+  diaryEntries: [], // { id, date, entry, emotion, sentiment, userId }
   tasks: [],   // { id, description, completed }
   sharedLetters: [], // { id, content, tags, date, mood }
 
@@ -35,6 +36,31 @@ export const useAppStore = create(persist((set, get) => ({
     }
   },
 
+  // Firestore: Add a diary entry for the current user
+  addDiaryEntry: async (entry) => {
+    console.log('addDiaryEntry called with:', entry);
+    const user = auth.currentUser;
+    console.log('Current user:', user);
+    if (!user) {
+      console.error('No authenticated user found');
+      throw new Error('No authenticated user found');
+    }
+    try {
+      const docRef = await addDoc(collection(db, 'diaryEntries'), {
+        ...entry,
+        userId: user.uid,
+        createdAt: new Date().toISOString(),
+      });
+      console.log('Diary entry added to Firestore with ID:', docRef.id);
+      set(state => ({
+        diaryEntries: [...state.diaryEntries, { ...entry, id: docRef.id, userId: user.uid }],
+      }));
+    } catch (error) {
+      console.error('Error adding diary entry to Firestore:', error);
+      throw error;
+    }
+  },
+
   // Firestore: Update a letter
   updateLetter: async (id, updatedLetter) => {
     console.log('updateLetter called with ID:', id, 'and data:', updatedLetter);
@@ -59,6 +85,30 @@ export const useAppStore = create(persist((set, get) => ({
     }
   },
 
+  // Firestore: Update a diary entry
+  updateDiaryEntry: async (id, updatedEntry) => {
+    console.log('updateDiaryEntry called with ID:', id, 'and data:', updatedEntry);
+    const user = auth.currentUser;
+    console.log('Current user:', user);
+    if (!user) {
+      console.error('No authenticated user found');
+      throw new Error('No authenticated user found');
+    }
+    try {
+      const entryRef = doc(db, 'diaryEntries', id);
+      await updateDoc(entryRef, updatedEntry);
+      console.log('Diary entry updated in Firestore');
+      set(state => ({
+        diaryEntries: state.diaryEntries.map(entry =>
+          entry.id === id ? { ...entry, ...updatedEntry } : entry
+        ),
+      }));
+    } catch (error) {
+      console.error('Error updating diary entry in Firestore:', error);
+      throw error;
+    }
+  },
+
   // Firestore: Load all letters for the current user
   loadLetters: async () => {
     const user = auth.currentUser;
@@ -72,6 +122,19 @@ export const useAppStore = create(persist((set, get) => ({
     set({ letters });
   },
 
+  // Firestore: Load all diary entries for the current user
+  loadDiaryEntries: async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      set({ diaryEntries: [] });
+      return;
+    }
+    const q = query(collection(db, 'diaryEntries'), where('userId', '==', user.uid));
+    const querySnapshot = await getDocs(q);
+    const diaryEntries = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    set({ diaryEntries });
+  },
+
   // Firestore: Delete a letter
   deleteLetter: async (id) => {
     await deleteDoc(doc(db, 'letters', id));
@@ -80,7 +143,16 @@ export const useAppStore = create(persist((set, get) => ({
     }));
   },
 
+  // Firestore: Delete a diary entry
+  deleteDiaryEntry: async (id) => {
+    await deleteDoc(doc(db, 'diaryEntries', id));
+    set(state => ({
+      diaryEntries: state.diaryEntries.filter(entry => entry.id !== id),
+    }));
+  },
+
   clearLetters: () => set({ letters: [] }),
+  clearDiaryEntries: () => set({ diaryEntries: [] }),
 
   addTask: (description) => {
     const id = Date.now().toString();

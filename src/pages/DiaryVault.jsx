@@ -3,14 +3,18 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useState, useEffect } from 'react';
 import { analyzeSentiment } from '../utils/sentimentAnalyzer';
+import { useAppStore } from '../store';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 function DiaryVault() {
-  const [entries, setEntries] = useState(() => JSON.parse(localStorage.getItem('diaryEntries') || '[]'));
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
   const [editContent, setEditContent] = useState('');
   const [editEmotion, setEditEmotion] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   const emotions = [
     { label: '😊', value: 'happy' },
@@ -20,17 +24,28 @@ function DiaryVault() {
     { label: '😐', value: 'neutral' }
   ];
 
-  useEffect(() => {
-    const handle = () => setEntries(JSON.parse(localStorage.getItem('diaryEntries') || '[]'));
-    window.addEventListener('focus', handle);
-    handle();
-    return () => window.removeEventListener('focus', handle);
-  }, []);
+  const diaryEntries = useAppStore(state => state.diaryEntries);
+  const deleteDiaryEntry = useAppStore(state => state.deleteDiaryEntry);
+  const updateDiaryEntry = useAppStore(state => state.updateDiaryEntry);
+  const loadDiaryEntries = useAppStore(state => state.loadDiaryEntries);
 
-  const handleDelete = (id) => {
-    const updated = entries.filter(e => e.id !== id);
-    localStorage.setItem('diaryEntries', JSON.stringify(updated));
-    setEntries(updated);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+      setAuthLoading(false);
+      if (firebaseUser) {
+        await loadDiaryEntries();
+      }
+    });
+    return () => unsubscribe();
+  }, [loadDiaryEntries]);
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteDiaryEntry(id);
+    } catch (error) {
+      console.error('Error deleting diary entry:', error);
+    }
   };
 
   const handleEdit = (entry) => {
@@ -49,18 +64,12 @@ function DiaryVault() {
       const sentimentResult = await analyzeSentiment(editContent);
       
       const updatedEntry = {
-        ...editingEntry,
         entry: editContent,
         emotion: sentimentResult.mood, // Use sentiment analysis mood instead of manual selection
         sentiment: sentimentResult
       };
 
-      const updatedEntries = entries.map(entry => 
-        entry.id === editingEntry.id ? updatedEntry : entry
-      );
-
-      localStorage.setItem('diaryEntries', JSON.stringify(updatedEntries));
-      setEntries(updatedEntries);
+      await updateDiaryEntry(editingEntry.id, updatedEntry);
       setEditDialogOpen(false);
       setEditingEntry(null);
       setEditContent('');
@@ -69,17 +78,11 @@ function DiaryVault() {
       console.error('Error saving edited entry:', error);
       // Fallback without sentiment analysis
       const updatedEntry = {
-        ...editingEntry,
         entry: editContent,
         emotion: editEmotion // Fallback to manual selection if sentiment analysis fails
       };
 
-      const updatedEntries = entries.map(entry => 
-        entry.id === editingEntry.id ? updatedEntry : entry
-      );
-
-      localStorage.setItem('diaryEntries', JSON.stringify(updatedEntries));
-      setEntries(updatedEntries);
+      await updateDiaryEntry(editingEntry.id, updatedEntry);
       setEditDialogOpen(false);
       setEditingEntry(null);
       setEditContent('');
@@ -95,16 +98,46 @@ function DiaryVault() {
     setEditContent('');
     setEditEmotion('');
   };
+
+  if (authLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Box sx={{ minHeight: '100vh', width: '100vw', background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)', px: 0, py: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <Paper sx={{ p: 5, borderRadius: 6, background: '#f3e8ff', boxShadow: 4, textAlign: 'center', maxWidth: 500 }}>
+          <Typography variant='h4' sx={{ fontWeight: 700, mb: 3, color: 'primary.main' }}>Sign In Required</Typography>
+          <Typography sx={{ mb: 4, fontSize: '1.1rem' }}>
+            Please sign in to view your diary entries.
+          </Typography>
+          <Button 
+            variant='contained' 
+            color='primary' 
+            onClick={() => window.dispatchEvent(new Event('openSignInDialog'))}
+            sx={{ py: 2, px: 4, fontSize: '1.1rem', borderRadius: 3 }}
+          >
+            Sign In
+          </Button>
+        </Paper>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ minHeight: '100vh', width: '100vw', background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)', px: 0, py: 6, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
       <Typography variant='h4' sx={{ fontWeight: 700, mb: 4, color: 'primary.main', textAlign: 'left', pl: { xs: 2, md: 6 } }}>Diary Vault</Typography>
       <Stack spacing={4} sx={{ width: '100%', maxWidth: 700, alignItems: 'flex-start', pl: { xs: 2, md: 6 } }}>
-        {entries.length === 0 ? (
+        {diaryEntries.length === 0 ? (
           <Paper sx={{ p: 5, borderRadius: 6, background: '#f3e8ff', boxShadow: 4, textAlign: 'left', width: '100%' }}>
             <Typography color='text.secondary' sx={{ fontSize: '1.2rem' }}>No diary entries yet.</Typography>
           </Paper>
         ) : (
-          entries.map((entry) => (
+          diaryEntries.map((entry) => (
             <Paper key={entry.id} sx={{ p: 5, borderRadius: 6, background: '#fff', boxShadow: 4, position: 'relative', width: '100%' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>

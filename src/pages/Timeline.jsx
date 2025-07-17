@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Fade,
   Grid,
+  Button,
 } from '@mui/material';
 import {
   Chart as ChartJS,
@@ -22,6 +23,8 @@ import { Line } from 'react-chartjs-2';
 import { decryptLetter } from '../utils/encryption';
 import { useAppStore } from '../store';
 import { SpotlightTourContext } from '../App';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 ChartJS.register(
   CategoryScale,
@@ -55,11 +58,22 @@ function mapEmotionToScore(emotion) {
 
 function Timeline() {
   const letters = useAppStore(state => state.letters);
+  const diaryEntries = useAppStore(state => state.diaryEntries);
   const [chartData, setChartData] = useState(null);
   const [show, setShow] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const { spotlightRefs } = useContext(SpotlightTourContext) || {};
 
-  useState(() => { setTimeout(() => setShow(true), 200); }, []);
+  useEffect(() => { setTimeout(() => setShow(true), 200); }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Temporary function to test sentiment analysis
   const testSentimentAnalysis = async () => {
@@ -88,7 +102,6 @@ I hope you reflect on this, not to argue or defend, but to understand where I'm 
   testSentimentAnalysis();
 
   useEffect(() => {
-    const diaryEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
     const allEntries = [];
     
     // Add letters with mood categorization
@@ -229,7 +242,6 @@ I hope you reflect on this, not to argue or defend, but to understand where I'm 
   }, [letters]);
 
   // Quick stats
-  const diaryEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
   const totalEntries = letters.length + diaryEntries.length;
   const allSentiments = [
     ...letters.map(l => {
@@ -244,6 +256,45 @@ I hope you reflect on this, not to argue or defend, but to understand where I'm 
   const avgSentiment = allSentiments.length > 0
     ? (allSentiments.reduce((a, b) => a + b, 0) / allSentiments.length).toFixed(2)
     : '--';
+
+  if (authLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Box sx={{
+        minHeight: '100vh',
+        background: '#e0f7fa',
+        backgroundImage: 'linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%)',
+        py: 6,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <Container maxWidth="md">
+          <Paper sx={{ p: 5, borderRadius: 6, background: '#f3e8ff', boxShadow: 4, textAlign: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, color: 'primary.main' }}>Sign In Required</Typography>
+            <Typography sx={{ mb: 4, fontSize: '1.1rem' }}>
+              Please sign in to view your emotional timeline.
+            </Typography>
+            <Button 
+              variant='contained' 
+              color='primary' 
+              onClick={() => window.dispatchEvent(new Event('openSignInDialog'))}
+              sx={{ py: 2, px: 4, fontSize: '1.1rem', borderRadius: 3 }}
+            >
+              Sign In
+            </Button>
+          </Paper>
+        </Container>
+      </Box>
+    );
+  }
 
   if (!letters) {
     return (

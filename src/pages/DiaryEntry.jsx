@@ -1,7 +1,10 @@
 import { Box, Typography, TextField, Button, ToggleButton, ToggleButtonGroup, Paper, Snackbar, IconButton, Tooltip, Container } from '@mui/material';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Mic as MicIcon, Lock as LockIcon } from '@mui/icons-material';
 import { analyzeSentiment } from '../utils/sentimentAnalyzer';
+import { useAppStore } from '../store';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const emotions = [
   { label: '😊', value: 'happy' },
@@ -15,31 +18,40 @@ function DiaryEntry() {
   const [entry, setEntry] = useState('');
   const [emotion, setEmotion] = useState('');
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   
   const wordCount = entry.trim().split(/\s+/).filter(Boolean).length;
+  const addDiaryEntry = useAppStore(state => state.addDiaryEntry);
 
-
-
-
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleSave = async () => {
+    if (!user) {
+      setOpen(true);
+      return;
+    }
+
     try {
       const today = new Date().toISOString().slice(0, 10);
-      const diaryEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
       
       // Analyze sentiment for the diary entry
       const sentimentResult = await analyzeSentiment(entry);
       
       const newEntry = { 
-        id: Date.now().toString(), 
         date: today, 
         entry, 
         emotion,
         sentiment: sentimentResult
       };
       
-      const updatedEntries = [newEntry, ...diaryEntries];
-      localStorage.setItem('diaryEntries', JSON.stringify(updatedEntries));
+      await addDiaryEntry(newEntry);
       setEntry('');
       setEmotion('');
       setOpen(true);
@@ -47,15 +59,55 @@ function DiaryEntry() {
       console.error('Error saving diary entry:', error);
       // Fallback to saving without sentiment analysis
       const today = new Date().toISOString().slice(0, 10);
-      const diaryEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
-      const newEntry = { id: Date.now().toString(), date: today, entry, emotion };
-      const updatedEntries = [newEntry, ...diaryEntries];
-      localStorage.setItem('diaryEntries', JSON.stringify(updatedEntries));
+      const newEntry = { date: today, entry, emotion };
+      await addDiaryEntry(newEntry);
       setEntry('');
       setEmotion('');
       setOpen(true);
     }
   };
+
+  if (authLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Box sx={{
+        minHeight: '100vh',
+        py: 6,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column'
+      }}>
+        <Container maxWidth="md">
+          <Paper
+            elevation={6}
+            sx={{ p: 5, borderRadius: 6, mt: 2, boxShadow: '0 8px 32px 0 rgba(110,198,255,0.10)', background: '#f3e8ff', textAlign: 'center' }}
+          >
+            <Typography variant='h4' sx={{ fontWeight: 700, mb: 3, color: 'primary.main' }}>Sign In Required</Typography>
+            <Typography sx={{ mb: 4, fontSize: '1.1rem' }}>
+              Please sign in to write diary entries and save them to your account.
+            </Typography>
+            <Button 
+              variant='contained' 
+              color='primary' 
+              onClick={() => window.dispatchEvent(new Event('openSignInDialog'))}
+              sx={{ py: 2, px: 4, fontSize: '1.1rem', borderRadius: 3 }}
+            >
+              Sign In
+            </Button>
+          </Paper>
+        </Container>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{
       minHeight: '100vh',

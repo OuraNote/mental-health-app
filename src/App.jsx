@@ -322,8 +322,9 @@ function App() {
           setUser(firebaseUser);
         }
         
-        // Load user letters
+        // Load user data
         useAppStore.getState().loadLetters();
+        useAppStore.getState().loadDiaryEntries();
       } else {
         setUser(null);
       }
@@ -346,6 +347,21 @@ function App() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      
+      // Clear all local data when signing out
+      localStorage.removeItem('diaryEntries');
+      localStorage.removeItem('isPremium');
+      
+      // Clear any other user-specific data
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('promptIdx_') || key.startsWith('birthday-') || key.startsWith('echoDropShown_'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
       setSnackbar({ open: true, message: 'Successfully signed out!' });
     } catch (error) {
       console.error('Sign out error:', error);
@@ -433,6 +449,9 @@ function App() {
             onSignOut={() => {
               setUser(null);
               useAppStore.getState().clearLetters();
+              useAppStore.getState().clearDiaryEntries();
+              // Force a page refresh to clear all local state
+              window.location.reload();
             }}
             onOpenAuthDialog={() => setAuthDialogOpen(true)}
           >
