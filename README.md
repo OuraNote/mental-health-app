@@ -1,5 +1,22 @@
 # Mental Health App
 
+**⚠️ PROPRIETARY SOFTWARE - UNAUTHORIZED USE PROHIBITED ⚠️**
+
+**This repository is PUBLIC for deployment purposes only.**
+- ❌ **NO CLONING** - Unauthorized cloning is prohibited
+- ❌ **NO FORKING** - Forking this repository is not permitted  
+- ❌ **NO COMMERCIAL USE** - Commercial use is strictly forbidden
+- ❌ **NO REDISTRIBUTION** - Redistribution is not allowed
+
+**✅ PERMITTED:**
+- ✅ Use the live web app: https://ouranote.github.io/mental-health-app/
+- ✅ Educational reference (students only)
+- ✅ Contact us for licensing: ouranote@gmail.com
+
+**📧 Report violations to:** ouranote@gmail.com
+
+---
+
 A comprehensive mental health application built with React, featuring diary entries, letter writing, emotional tracking, and AI-powered sentiment analysis.
 
 ## Features
