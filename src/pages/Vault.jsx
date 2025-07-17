@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -21,7 +21,7 @@ import {
   Fade,
 } from '@mui/material';
 import { Lock as LockIcon, LockOpen as LockOpenIcon } from '@mui/icons-material';
-import { decryptLetter, isLetterUnlocked } from '../utils/encryption';
+import { decryptLetter, isLetterUnlocked, cleanupBlobUrl } from '../utils/encryption';
 import { useAppStore } from '../store';
 import Snackbar from '@mui/material/Snackbar';
 import Chip from '@mui/material/Chip';
@@ -119,6 +119,10 @@ function Vault() {
   };
 
   const handleCloseDialog = () => {
+    // Cleanup blob URL if it exists
+    if (selectedLetter?.mediaUrl) {
+      cleanupBlobUrl(selectedLetter.mediaUrl);
+    }
     setOpenDialog(false);
     setSelectedLetter(null);
   };
@@ -178,8 +182,8 @@ function Vault() {
   const handleEditLetter = (letter) => {
     try {
       const decryptedLetter = decryptLetter(letter);
-      // Navigate to WriteLetter with edit mode and decrypted data
-      navigate('/write', { state: { edit: true, letterId: letter.id, letterData: decryptedLetter } });
+      // Always pass the Firestore doc ID as letterId
+      navigate('/write', { state: { edit: true, letterId: letter.id, letterData: { ...decryptedLetter, id: letter.id } } });
     } catch (error) {
       alert('Error decrypting letter for editing: ' + error.message);
     }
@@ -188,15 +192,54 @@ function Vault() {
   const handleDeleteLetter = async (letterId) => {
     if (window.confirm('Are you sure you want to delete this letter? This cannot be undone.')) {
       setLoading(true);
-      await deleteLetter(letterId);
-      if (loadLetters) {
-        await loadLetters();
+      try {
+        console.log('Attempting to delete letter:', letterId);
+        console.log('Letter ID type:', typeof letterId);
+        console.log('Selected letter ID:', selectedLetter?.id);
+        console.log('Selected letter ID type:', typeof selectedLetter?.id);
+        console.log('Selected letter:', selectedLetter);
+        console.log('Current letters count:', letters.length);
+        
+        // Check if the letter exists in the current letters array
+        const letterExists = letters.find(l => l.id === letterId || l.id === letterId.toString());
+        console.log('Letter exists in store:', !!letterExists);
+        console.log('Found letter:', letterExists);
+        
+        // Close dialog and clear selected letter if the deleted letter is currently open
+        if (selectedLetter && (selectedLetter.id === letterId || selectedLetter.id === letterId.toString())) {
+          console.log('Closing dialog for deleted letter');
+          setOpenDialog(false);
+          setSelectedLetter(null);
+        }
+        
+        console.log('Calling deleteLetter with ID:', letterId);
+        await deleteLetter(letterId);
+        console.log('Delete completed, letters count should be updated in store');
+        
+        // Verify the letter was removed from store
+        const letterStillExists = letters.find(l => l.id === letterId || l.id === letterId.toString());
+        console.log('Letter still exists in store after deletion:', !!letterStillExists);
+        console.log('Updated letters count:', letters.length);
+        
+        setSnackbar({ open: true, message: 'Letter deleted.' });
+        setRefreshKey(k => k + 1);
+      } catch (err) {
+        console.error('Delete error:', err);
+        setSnackbar({ open: true, message: 'Failed to delete letter.' });
+      } finally {
+        setLoading(false);
       }
-      setSnackbar({ open: true, message: 'Letter deleted.' });
-      setRefreshKey(k => k + 1);
-      setLoading(false);
     }
   };
+
+  // Cleanup blob URLs on component unmount
+  useEffect(() => {
+    return () => {
+      if (selectedLetter?.mediaUrl) {
+        cleanupBlobUrl(selectedLetter.mediaUrl);
+      }
+    };
+  }, [selectedLetter]);
 
   if (loading) {
     return (
@@ -241,6 +284,10 @@ function Vault() {
                 const unlocked = isFullyUnlocked(letter);
                 const task = letter.taskId ? getTask(letter.taskId) : null;
                 const canEdit = isWithinGracePeriod(letter);
+                let decryptedTitle = '';
+                try {
+                  decryptedTitle = decryptLetter(letter).title || '';
+                } catch {}
                 return (
                   <Grid item xs={12} sm={6} md={4} key={letter.id}>
                     <Fade in={show} style={{ transitionDelay: `${200 + idx * 120}ms` }}>
@@ -277,7 +324,7 @@ function Vault() {
                             {unlocked ? <LockOpenIcon fontSize="inherit" /> : <LockIcon fontSize="inherit" />}
                           </Box>
                           <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
-                            Letter #{letter.id}
+                            {decryptedTitle ? decryptedTitle : `Letter #${letter.id}`}
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}>
                             Unlocks: {new Date(letter.unlockDate).toLocaleDateString()}
@@ -378,6 +425,18 @@ function Vault() {
                   return null;
                 })()}
 
+                {/* Moods Display */}
+                {selectedLetter.moods && selectedLetter.moods.length > 0 && (
+                  <Box sx={{ mt: 2, mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Moods:</Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      {selectedLetter.moods.map((mood) => (
+                        <Chip key={mood} label={mood} color="primary" />
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+
                 {/* Letter Summary */}
                 <Typography variant="subtitle1" sx={{ fontStyle: 'italic', mb: 1 }}>
                   {selectedLetter.content.split('.').slice(0, 2).join('.') + '.'}
@@ -413,9 +472,32 @@ function Vault() {
                 {selectedLetter.mediaUrl && (
                   <Box sx={{ mt: 2 }}>
                     {selectedLetter.mediaType === 'audio' ? (
-                      <audio controls src={selectedLetter.mediaUrl} />
+                      <audio 
+                        controls 
+                        src={selectedLetter.mediaUrl}
+                        onError={(e) => {
+                          console.error('Audio playback error:', e);
+                          setSnackbar({ 
+                            open: true, 
+                            message: 'Failed to play audio. The file may be corrupted.', 
+                            severity: 'error' 
+                          });
+                        }}
+                      />
                     ) : selectedLetter.mediaType === 'video' ? (
-                      <video controls src={selectedLetter.mediaUrl} style={{ maxWidth: '100%' }} />
+                      <video 
+                        controls 
+                        src={selectedLetter.mediaUrl} 
+                        style={{ maxWidth: '100%' }}
+                        onError={(e) => {
+                          console.error('Video playback error:', e);
+                          setSnackbar({ 
+                            open: true, 
+                            message: 'Failed to play video. The file may be corrupted.', 
+                            severity: 'error' 
+                          });
+                        }}
+                      />
                     ) : null}
                     {selectedLetter.transcription && (
                       <Box sx={{ mt: 1 }}>
@@ -480,17 +562,6 @@ function Vault() {
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleCloseDialog}>Close</Button>
-                <Tooltip title="Share this letter anonymously on the Letter Wall" arrow>
-                  <Button
-                    ref={spotlightRefs?.vaultShareBtn}
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => setShareDialogOpen(true)}
-                    disabled={!selectedLetter}
-                  >
-                    Share Anonymously
-                  </Button>
-                </Tooltip>
               </DialogActions>
             </>
           )}

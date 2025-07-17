@@ -9,6 +9,8 @@ import Timeline from './pages/Timeline';
 import LetterWall from './pages/LetterWall';
 import DiaryEntry from './pages/DiaryEntry';
 import DiaryVault from './pages/DiaryVault';
+import MediaTest from './pages/MediaTest';
+import Community from './pages/Community';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Dialog from '@mui/material/Dialog';
@@ -18,7 +20,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useAppStore } from './store';
-import { decryptLetter } from './utils/encryption';
+import { decryptLetter, cleanupBlobUrl } from './utils/encryption';
 import Box from '@mui/material/Box';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import IconButton from '@mui/material/IconButton';
@@ -362,6 +364,8 @@ function App() {
               <Route path="/wall" element={<LetterWall />} />
               <Route path="/diary" element={<DiaryEntry />} />
               <Route path="/diary-vault" element={<DiaryVault />} />
+              <Route path="/media-test" element={<MediaTest />} />
+              <Route path="/community" element={<Community />} />
             </Routes>
           </Layout>
         </Router>
@@ -372,7 +376,12 @@ function App() {
           onClose={() => setSnackbar({ open: false, message: '' })}
           message={snackbar.message}
         />
-        <Dialog open={echoDropOpen && !!echoDropLetter} onClose={() => setEchoDropOpen(false)} maxWidth="sm" fullWidth>
+        <Dialog open={echoDropOpen && !!echoDropLetter} onClose={() => {
+          if (echoDropLetter?.mediaUrl) {
+            cleanupBlobUrl(echoDropLetter.mediaUrl);
+          }
+          setEchoDropOpen(false);
+        }} maxWidth="sm" fullWidth>
           {echoDropLetter && (
             <>
               <DialogTitle>EchoDrop: A Message from Your Past Self</DialogTitle>
@@ -382,9 +391,32 @@ function App() {
                 {echoDropLetter.mediaUrl && (
                   <Box sx={{ mt: 2 }}>
                     {echoDropLetter.mediaType === 'audio' ? (
-                      <audio controls src={echoDropLetter.mediaUrl} />
+                      <audio 
+                        controls 
+                        src={echoDropLetter.mediaUrl}
+                        onError={(e) => {
+                          console.error('Audio playback error:', e);
+                          setSnackbar({ 
+                            open: true, 
+                            message: 'Failed to play audio. The file may be corrupted.', 
+                            severity: 'error' 
+                          });
+                        }}
+                      />
                     ) : echoDropLetter.mediaType === 'video' ? (
-                      <video controls src={echoDropLetter.mediaUrl} style={{ maxWidth: '100%' }} />
+                      <video 
+                        controls 
+                        src={echoDropLetter.mediaUrl} 
+                        style={{ maxWidth: '100%' }}
+                        onError={(e) => {
+                          console.error('Video playback error:', e);
+                          setSnackbar({ 
+                            open: true, 
+                            message: 'Failed to play video. The file may be corrupted.', 
+                            severity: 'error' 
+                          });
+                        }}
+                      />
                     ) : null}
                     {echoDropLetter.transcription && (
                       <Box sx={{ mt: 1 }}>

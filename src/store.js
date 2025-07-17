@@ -12,29 +12,51 @@ export const useAppStore = create(persist((set, get) => ({
 
   // Firestore: Add a letter for the current user
   addLetter: async (letter) => {
+    console.log('addLetter called with:', letter);
     const user = auth.currentUser;
-    if (!user) return;
-    const docRef = await addDoc(collection(db, 'letters'), {
-      ...letter,
-      userId: user.uid,
-      createdAt: new Date().toISOString(),
-    });
-    set(state => ({
-      letters: [...state.letters, { ...letter, id: docRef.id, userId: user.uid }],
-    }));
+    console.log('Current user:', user);
+    if (!user) {
+      console.error('No authenticated user found');
+      throw new Error('No authenticated user found');
+    }
+    try {
+      const docRef = await addDoc(collection(db, 'letters'), {
+        ...letter,
+        userId: user.uid,
+        createdAt: new Date().toISOString(),
+      });
+      console.log('Letter added to Firestore with ID:', docRef.id);
+      set(state => ({
+        letters: [...state.letters, { ...letter, id: docRef.id, userId: user.uid }],
+      }));
+    } catch (error) {
+      console.error('Error adding letter to Firestore:', error);
+      throw error;
+    }
   },
 
   // Firestore: Update a letter
   updateLetter: async (id, updatedLetter) => {
+    console.log('updateLetter called with ID:', id, 'and data:', updatedLetter);
     const user = auth.currentUser;
-    if (!user) return;
-    const letterRef = doc(db, 'letters', id);
-    await updateDoc(letterRef, updatedLetter);
-    set(state => ({
-      letters: state.letters.map(letter =>
-        letter.id === id ? { ...letter, ...updatedLetter } : letter
-      ),
-    }));
+    console.log('Current user:', user);
+    if (!user) {
+      console.error('No authenticated user found');
+      throw new Error('No authenticated user found');
+    }
+    try {
+      const letterRef = doc(db, 'letters', id);
+      await updateDoc(letterRef, updatedLetter);
+      console.log('Letter updated in Firestore');
+      set(state => ({
+        letters: state.letters.map(letter =>
+          letter.id === id ? { ...letter, ...updatedLetter } : letter
+        ),
+      }));
+    } catch (error) {
+      console.error('Error updating letter in Firestore:', error);
+      throw error;
+    }
   },
 
   // Firestore: Load all letters for the current user
@@ -93,4 +115,36 @@ export const useAppStore = create(persist((set, get) => ({
 
 }), {
   name: 'mental-health-app-store',
+  // Add storage configuration to handle storage access issues
+  storage: {
+    getItem: (name) => {
+      try {
+        const item = sessionStorage.getItem(name);
+        return item ? JSON.parse(item) : null;
+      } catch (error) {
+        console.warn('Failed to get item from sessionStorage:', error);
+        return null;
+      }
+    },
+    setItem: (name, value) => {
+      try {
+        sessionStorage.setItem(name, JSON.stringify(value));
+      } catch (error) {
+        console.warn('Failed to set item in sessionStorage:', error);
+        // Fallback to localStorage if sessionStorage fails
+        try {
+          localStorage.setItem(name, JSON.stringify(value));
+        } catch (fallbackError) {
+          console.warn('Failed to set item in localStorage as fallback:', fallbackError);
+        }
+      }
+    },
+    removeItem: (name) => {
+      try {
+        sessionStorage.removeItem(name);
+      } catch (error) {
+        console.warn('Failed to remove item from sessionStorage:', error);
+      }
+    },
+  },
 })); 
