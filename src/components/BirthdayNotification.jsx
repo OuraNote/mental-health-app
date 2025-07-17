@@ -19,7 +19,7 @@ function BirthdayNotification({ user, open, onClose }) {
   const diaryEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
 
   useEffect(() => {
-    if (!user || !open) return;
+    if (!user || !open || !user.birthday) return;
 
     const generateBirthdayMessage = () => {
       const totalEntries = letters.length + diaryEntries.length;

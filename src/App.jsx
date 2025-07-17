@@ -34,6 +34,11 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Popover from '@mui/material/Popover';
 import React, { createContext } from 'react';
+import AuthDialog from './components/AuthDialog';
+import { auth } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
 const lightTheme = createTheme({
   palette: {
@@ -219,7 +224,7 @@ export const SpotlightTourContext = createContext();
 const TOUR_STEPS = [
   {
     title: 'Welcome! Start Your Journey',
-    content: 'Welcome to your Mental Health Time Capsule! This app helps you reflect, grow, and connect with your future self. Let’s take a quick tour of the main features. (Tip: Works great on mobile too!)',
+    content: 'Welcome to OuraNote! This app helps you reflect, grow, and connect with your future self. Let’s take a quick tour of the main features. (Tip: Works great on mobile too!)',
     refKey: 'getStartedBtn',
   },
   {
@@ -285,6 +290,67 @@ function App() {
     growthWordCloud: useRef(null),
     wallFilterChip: useRef(null),
     wallLikeBtn: useRef(null),
+  };
+
+  // Authentication state
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Load user data from Firestore
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUser({
+              ...firebaseUser,
+              firstName: userData.firstName,
+              surname: userData.surname,
+              middleName: userData.middleName,
+              birthday: userData.birthday
+            });
+          } else {
+            // User exists in Firebase Auth but not in Firestore
+            setUser(firebaseUser);
+          }
+        } catch (error) {
+          console.error('Error loading user data:', error);
+          setUser(firebaseUser);
+        }
+        
+        // Load user letters
+        useAppStore.getState().loadLetters();
+      } else {
+        setUser(null);
+      }
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setAuthDialogOpen(true);
+    window.addEventListener('openSignInDialog', handler);
+    return () => window.removeEventListener('openSignInDialog', handler);
+  }, []);
+
+  const handleAuthSuccess = () => {
+    setSnackbar({ open: true, message: 'Successfully signed in!' });
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setSnackbar({ open: true, message: 'Successfully signed out!' });
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setSnackbar({ open: true, message: 'Error signing out' });
+    }
   };
 
   const handleCloseOnboarding = () => {
@@ -362,7 +428,14 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Layout>
+          <Layout 
+            user={user}
+            onSignOut={() => {
+              setUser(null);
+              useAppStore.getState().clearLetters();
+            }}
+            onOpenAuthDialog={() => setAuthDialogOpen(true)}
+          >
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/write" element={<WriteLetter />} />
@@ -447,7 +520,7 @@ function App() {
         </Dialog>
         {/* Onboarding Modal */}
         <Dialog open={onboardingOpen} onClose={handleCloseOnboarding} maxWidth="sm" fullWidth>
-          <DialogTitle>Welcome to Your Time Capsule!</DialogTitle>
+          <DialogTitle>Welcome to OuraNote!</DialogTitle>
           <DialogContent>
             <Typography variant="h6" gutterBottom>How to get started:</Typography>
             <ul>
@@ -494,7 +567,7 @@ function App() {
               <li><b>What is GrowthLens?</b> It visualizes your emotional and personal growth over time.</li>
             </ul>
             <Typography variant="h6" sx={{ mt: 3 }}>Need more help?</Typography>
-            <Typography>Email: support@timecapsule.app</Typography>
+            <Typography>Email: ouranote@gmail.com</Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setHelpOpen(false)} variant="contained">Close</Button>
@@ -538,6 +611,12 @@ function App() {
             )}
           </Box>
         </Popover>
+        {/* Authentication Dialog */}
+        <AuthDialog
+          open={authDialogOpen}
+          onClose={() => setAuthDialogOpen(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
       </ThemeProvider>
     </SpotlightTourContext.Provider>
     </ThemeToggleContext.Provider>

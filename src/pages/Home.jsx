@@ -114,7 +114,7 @@ function Home() {
       <Fade in={show} timeout={1200}>
         <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 6 }, width: '100%', boxSizing: 'border-box' }}>
           <Typography variant="h2" sx={{ fontWeight: 800, mb: { xs: 1, sm: 2 }, color: 'primary.main', letterSpacing: 1, fontSize: { xs: '1.5rem', sm: '2.8rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
-            Welcome to Your Time Capsule
+            Welcome to OuraNote
           </Typography>
           <Typography variant="h5" color="text.secondary" sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1rem', sm: '1.5rem' }, maxWidth: '100%', overflowWrap: 'break-word', textAlign: 'center' }}>
             Reflect, grow, and connect with your future self in a safe, beautiful space.
