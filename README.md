@@ -69,9 +69,24 @@ This app is automatically deployed to GitHub Pages. Any push to the `main` branc
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## License & Ownership
 
-This project is licensed under the MIT License.
+This project is owned exclusively by **Aditya Kumar** and **Akshith Saravanan**.
+
+**⚠️ IMPORTANT: This code is NOT open source.**
+- ❌ **NO CLONING** - You may not clone, fork, or copy this repository
+- ❌ **NO COMMERCIAL USE** - You may not use this code for commercial purposes
+- ❌ **NO REDISTRIBUTION** - You may not redistribute or sell this software
+- ❌ **NO DERIVATIVE WORKS** - You may not create works based on this code
+
+**✅ PERMITTED USES:**
+- ✅ Use the live web app for personal mental health tracking
+- ✅ Educational reference (students only)
+- ✅ Contact us for licensing inquiries
+
+**📧 Contact:** ouranote@gmail.com
+
+See [LICENSE](LICENSE) for full terms and conditions.
 
 ## Support
 

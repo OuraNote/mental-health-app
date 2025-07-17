@@ -1,3 +1,10 @@
+/**
+ * Mental Health Time Capsule
+ * Copyright (c) 2025 Aditya Kumar and Akshith Saravanan
+ * All rights reserved. This code is proprietary and confidential.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ */
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
